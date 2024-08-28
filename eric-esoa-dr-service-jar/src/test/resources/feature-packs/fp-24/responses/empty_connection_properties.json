@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "name": "empty_broker",
+        "subsystemType": {
+            "id": 2,
+            "type": "KAFKA"
+        },
+        "connectionProperties": [
+        ]
+    }
+]

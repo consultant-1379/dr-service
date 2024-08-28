@@ -1,0 +1,26 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Missing in Target"
+      ],
+      "properties": {
+        "name": "object_new",
+        "id": "1"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-21/reconcile/1\nBody: {\n  {\n \"sourceProp\": \"value1\"\n}\n}\n\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        }
+      ],
+      "status": "RECONCILED"
+    }
+  ],
+  "totalCount": 1
+}

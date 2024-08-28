@@ -1,0 +1,7 @@
+properties:
+  - name: prop1
+    value: value1
+  - name: prop2
+    value: 2
+  - name: prop3
+    value: false

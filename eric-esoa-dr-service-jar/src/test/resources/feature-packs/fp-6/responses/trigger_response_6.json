@@ -1,0 +1,18 @@
+{
+  "job": {
+    "inputs": {
+      "reconcileUrl": "http://localhost:8081/fp-6/reconcile",
+      "targetsUrl": "http://localhost:8081/fp-6/targets",
+      "sourcesUrl": "http://localhost:8081/fp-6/sources",
+      "enrichUrl": "http://localhost:8081/fp-6/enrich",
+      "input1": "input_value"
+    },
+    "name": "listener_6-job1",
+    "description": "Triggered by listener listener_6 with condition 'jinja({{request.eventType==properties.prop2}})' ",
+    "applicationJobName": "job1",
+    "status": "COMPLETED"
+  },
+  "outputs": {
+      "output1": "output_value"
+  }
+}

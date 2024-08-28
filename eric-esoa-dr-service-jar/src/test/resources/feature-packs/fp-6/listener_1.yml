@@ -1,0 +1,9 @@
+name: listener_1
+description: "test listener which fetches single source"
+triggers:
+  - condition: jinja({{request.eventType=='CREATE'}})
+    applicationName: application_5
+    jobName: job1
+    inputs:
+      reconcileUrl: jq(.request.reconcileUrl)
+      sourcesUrl: jq(.request.sourcesUrl)

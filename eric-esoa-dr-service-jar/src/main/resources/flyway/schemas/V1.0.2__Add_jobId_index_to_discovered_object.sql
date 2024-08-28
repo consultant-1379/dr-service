@@ -1,0 +1,1 @@
+create index discovered_object_job_id_idx on discovered_object(job_id);

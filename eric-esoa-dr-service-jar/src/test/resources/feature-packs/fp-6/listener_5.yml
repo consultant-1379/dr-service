@@ -1,0 +1,9 @@
+name: listener_5
+description: "test listener using jq function in condition"
+triggers:
+  - condition: jq(.request.eventType == "CREATE")
+    applicationName: application_5
+    jobName: job1
+    inputs:
+      reconcileUrl: jq(.request.reconcileUrl)
+      sourcesUrl: jq(.request.sourcesUrl)

@@ -1,0 +1,78 @@
+name: "application_3"
+description: |
+  - Contains invalid substitution to cause reconcile target error when substituting the http url
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: sourcesUrl
+          mandatory: true
+        - name: targetsUrl
+          mandatory: true
+      source:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.sourcesUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          postFunction: ~
+          mapping:
+            id: .id
+            name: .name
+        enrichAction: ~
+      target:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          postFunction: ~
+          properties:
+            url: "{{inputs.targetsUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          mapping:
+            id: .id
+            name: .name
+        enrichAction: ~
+      linkSourceAndTarget: 'id:id'
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+            arg: 'id:id'
+          filterMatchText: 'Missing in Source'
+          reconcileAction: default
+    reconcile:
+      inputs:
+        - name: reconcileUrl
+          mandatory: true
+      source:
+        enrichAction: ~
+      target:
+        enrichAction: ~
+        reconcileActions:
+          default:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputsXXX.reconcileUrl}}/{{source.id}}"
+              method: POST
+              headers:
+                Content-Type: [ "application/json" ]
+            postFunction: ~
+            mapping:
+              result: .result

@@ -1,0 +1,135 @@
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+version: '3'
+services:
+  dr:
+    container_name: dr-service
+    image: armdocker.rnd.ericsson.se/proj-esoa-so/eric-esoa-dr-service:${DR_SERVICE_VERSION}
+    environment:
+      - IGNORE_SCHEMA_ERRORS=${IGNORE_SCHEMA_ERRORS}
+      - FAIL_ON_UNKNOWN_TOKENS=${FAIL_ON_UNKNOWN_TOKENS}
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_PORT=5432
+      - DATABASE_DBNAME=drdb
+    networks:
+      dr_net:
+        aliases:
+          - eric-esoa-dr-service
+    ports:
+    - "${DR_SERVICE_PORT}:8080"
+    depends_on:
+      rest-service-init-container:
+        condition: service_completed_successfully
+    links:
+      - postgres
+  rest-service:
+    container_name: rest-service
+    image: armdocker.rnd.ericsson.se/proj-esoa-so/eric-esoa-rest-service:${REST_SERVICE_VERSION}
+    environment:
+      - CONNECTED_SYSTEM_URL=http://subsystem-manager:8080
+      - SPRING_CLOUD_KUBERNETES_ENABLED=false
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_PORT=5432
+      - DB_NAME=restdb
+    networks:
+      dr_net:
+        aliases:
+          - eric-esoa-rest-service
+    ports:
+      - "${REST_SERVICE_PORT}:8080"
+    depends_on:
+      rest-service-init-container:
+        condition: service_completed_successfully
+    links:
+      - postgres
+  subsystem-manager:
+    container_name: subsystem-manager
+    image: armdocker.rnd.ericsson.se/proj-esoa-so/eric-esoa-subsystem-management:1.0.10-1
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: subsystemsdb
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    networks:
+      dr_net:
+        aliases:
+          - eric-esoa-subsystem-management
+    ports:
+      - "${SUBSYSTEMS_PORT}:8080"
+    depends_on:
+      subsystems-init-container:
+        condition: service_completed_successfully
+    links:
+      - postgres
+  dr-service-init-container:
+    image: armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/postgres:${POSTGRES_VERSION}
+    container_name: dr-service-init-container
+    command: sh -c "export PGPASSWORD=postgres && psql -a -hpostgres -p5432 -Upostgres -c 'create database drdb' || exit 0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dr_net
+  rest-service-init-container:
+    image: armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/postgres:${POSTGRES_VERSION}
+    container_name: rest-service-init-container
+    command: sh -c "export PGPASSWORD=postgres && psql -a -hpostgres -p5432 -Upostgres -c 'create database restdb' || exit 0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dr_net
+  subsystems-init-container:
+    image: armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/postgres:${POSTGRES_VERSION}
+    container_name: subsystems-init-container
+    command: sh -c "export PGPASSWORD=postgres && psql -a -hpostgres -p5432 -Upostgres -c 'create database subsystemsdb' || exit 0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dr_net
+  postgres:
+    image: armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/postgres:${POSTGRES_VERSION}
+    container_name: postgres
+    command: postgres -c max_prepared_transactions=100
+    hostname: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U postgres -c '\\l'"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 1s
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - pgvol:/var/lib/postgresql/data
+    networks:
+      - dr_net
+networks:
+  dr_net:
+     name: dr_net
+     driver: bridge
+volumes:
+  pgvol:

@@ -1,0 +1,102 @@
+name: "application_10"
+description: |
+  - Test usage of custom groovy filter script which uses inputs, source and target args.
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: sourcesUrl
+          mandatory: true
+        - name: targetsUrl
+          mandatory: true
+      source:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.sourcesUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          postFunction: ~
+          mapping:
+            id: .id
+            name: .name
+        enrichAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.enrichUrl}}/{{source.id}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          postFunction: ~
+          mapping:
+            state: .state
+      target:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          postFunction: ~
+          properties:
+            url: "{{inputs.targetsUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          mapping:
+            id: .id
+            name: .name
+        enrichAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.enrichUrl}}/{{target.id}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          postFunction: ~
+          mapping:
+            state: .state
+      linkSourceAndTarget: 'id:id'
+      filters:
+        sourceNotInTarget:
+          condition:
+            name: sourceScript
+            arg: '@sourceNotInTarget_asset.groovy'
+          filterMatchText: 'Missing in Target'
+          reconcileAction: sourceNotInTarget
+    reconcile:
+      inputs:
+        - name: reconcileUrl
+          mandatory: true
+      source:
+        enrichAction: ~
+      target:
+        enrichAction: ~
+        reconcileActions:
+          sourceNotInTarget:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputs.reconcileUrl}}/{{source.id}}"
+              method: POST
+              headers:
+                Content-Type: [ "application/json" ]
+            postFunction: ~
+            mapping:
+              result: .result

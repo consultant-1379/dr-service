@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Missing in Target"
+      ],
+      "properties": {
+        "name": "object_new",
+        "id": "1"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    }
+  ],
+  "totalCount": 1
+}

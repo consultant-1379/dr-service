@@ -1,0 +1,18 @@
+  {
+    "id": "ID_TEMP",
+    "name": "TEST_Name",
+    "description": "This is a description",
+    "inputs": {},
+    "discoveredObjectsCount": 0,
+    "reconciledObjectsCount": 0,
+    "reconciledObjectsErrorCount": 0,
+    "errorMessage": null,
+    "featurePackId": "featurePackId",
+    "featurePackName": "fp-1",
+    "applicationId": "applicationId",
+    "applicationName": "app-1",
+    "applicationJobName": "jobName",
+    "startDate": "2023-03-16T12:30:11.281Z",
+    "completedDate": "2023-03-16T12:31:11.281Z",
+    "status": "DISCOVERY_INPROGRESS"
+  }

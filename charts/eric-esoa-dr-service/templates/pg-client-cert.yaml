@@ -1,0 +1,39 @@
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{- if and (eq (include "eric-esoa-so-library-chart.global-security-tls-enabled" .) "true") (.Values.database.requiresClientCert) }}
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  name: {{ template "eric-esoa-dr-service.name" . }}-pg-client-cert
+  labels:
+  {{ include "eric-esoa-dr-service.labels" . | nindent 4 }}
+  annotations:
+  {{ include "eric-esoa-dr-service.annotations" . | nindent 4 }}
+spec:
+  kubernetes:
+    generatedSecretName: {{ .Chart.Name }}-pg-client-cert
+    certificateName: tls.crt
+    privateKeyName: tls.key
+  certificate:
+    issuer:
+      reference: {{ .Values.database.host }}-client-ca
+    subject:
+      cn:  "{{ .Values.global.database.user }}"
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+{{- end }}

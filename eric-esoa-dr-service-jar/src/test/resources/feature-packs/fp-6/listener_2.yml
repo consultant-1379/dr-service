@@ -1,0 +1,14 @@
+name: listener_2
+description: "test listener with outputs"
+outputs:
+  eventType: jq(.request.eventType)
+  discoveryObjectStatus: jinja({{results[0].status}})
+  reconcileCommand: jinja({{results[0].filters[0].reconcileAction.command}})
+  reconcileCommandOutput: jinja({{results[0].filters[0].reconcileAction.commandOutput}})
+triggers:
+  - condition: jinja({{request.eventType=='CREATE'}})
+    applicationName: application_5
+    jobName: job1
+    inputs:
+      reconcileUrl: jq(.request.reconcileUrl)
+      sourcesUrl: jq(.request.sourcesUrl)

@@ -1,0 +1,17 @@
+name: listener_2
+description: "Test listener for kafka message"
+triggers:
+  - condition: jinja({{request.eventType=='CREATE_JOB_ONE'}})
+    applicationName: application_24
+    jobName: job1
+    inputs:
+      reconcileUrl: jq(.request.reconcileUrl)
+      sourcesUrl: jq(.request.sourcesUrl)
+      listenerName: listener_2
+  - condition: jinja({{request.eventType=='CREATE_JOB_TWO'}})
+    applicationName: application_24
+    jobName: job2
+    inputs:
+      reconcileUrl: jq(.request.reconcileUrl)
+      sourcesUrl: jq(.request.sourcesUrl)
+      listenerName: listener_2

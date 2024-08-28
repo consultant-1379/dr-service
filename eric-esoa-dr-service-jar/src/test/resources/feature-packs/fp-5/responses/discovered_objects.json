@@ -1,0 +1,45 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Found in Source"
+      ],
+      "properties": {
+        "name": "object1",
+        "id": "1",
+        "state": "Active"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    },
+    {
+      "discrepancies": [
+        "Found in Source"
+      ],
+      "properties": {
+        "name": "object2",
+        "id": "2",
+        "state": "Active"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    }
+  ],
+  "totalCount": 2
+}

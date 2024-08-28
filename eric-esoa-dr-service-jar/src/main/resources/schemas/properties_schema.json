@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "D&R Properties Configuration Schema",
+  "description": "Discovery and Reconciliation Properties Configuration Schema",
+  "type": "object",
+  "properties": {
+    "properties": {
+      "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {"$ref": "#/$defs/property"}
+        }
+  },
+    "$defs": {
+        "property": {
+            "type": "object",
+            "required": ["name", "value"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                }
+            }
+        }
+    },
+  "required": ["properties"],
+  "additionalProperties": false
+}

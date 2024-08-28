@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ /*******************************************************************************
+  ~  * COPYRIGHT Ericsson 2023
+  ~  *
+  ~  *
+  ~  *
+  ~  * The copyright to the computer program(s) herein is the property of
+  ~  *
+  ~  * Ericsson Inc. The programs may be used and/or copied only with written
+  ~  *
+  ~  * permission from Ericsson Inc. or in accordance with the terms and
+  ~  *
+  ~  * conditions stipulated in the agreement/contract under which the
+  ~  *
+  ~  * program(s) have been supplied.
+  ~  ******************************************************************************/
+  -->
+
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%X{traceId:-}] [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.ericsson.bos.dr.DRApplication" level="DEBUG"/>
+    <logger name="com.ericsson.bos.dr" level="DEBUG"/>
+    <logger name="org.springframework" level="INFO"/>
+    <!--logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+    <logger name="org.springframework.transaction.interceptor" level="TRACE"/-->
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

@@ -1,0 +1,9 @@
+{
+  "drUrl": "http://dr-service:8080",
+  "featurePackId": "1",
+  "applicationId": "1",
+  "applicationJobName": "job1",
+  "jobInputs": {
+    "url": "http://wiremock:8080"
+  }
+}

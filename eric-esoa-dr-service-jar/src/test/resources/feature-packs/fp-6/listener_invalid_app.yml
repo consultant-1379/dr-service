@@ -1,0 +1,8 @@
+name: listener_invalid_app
+description: "test listener which reference an invalid app"
+triggers:
+  - condition: jinja({{request.eventType=='CREATE'}})
+    applicationName: unknown
+    jobName: job1
+    inputs:
+

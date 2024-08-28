@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "id": "1",
+      "name": "TEST_NAME1",
+      "description": "This is a description",
+      "featurePackId": "featurePackId",
+      "featurePackName": "featurePackName",
+      "applicationId": "applicationId",
+      "applicationName": "applicationName",
+      "applicationJobName": "applicationJobName",
+      "startDate": "2023-03-16T12:30:11.281Z",
+      "status": "DISCOVERY_INPROGRESS"
+    },
+    {
+      "id": "2",
+      "name": "TEST_NAME2",
+      "description": "This is a description",
+      "featurePackId": "featurePackId",
+      "featurePackName": "featurePackName",
+      "applicationId": "applicationId",
+      "applicationName": "applicationName",
+      "applicationJobName": "applicationJobName",
+      "startDate": "2023-03-16T12:30:11.281Z",
+      "status": "DISCOVERY_INPROGRESS"
+    }
+  ],
+  "totalCount": "2"
+}

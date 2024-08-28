@@ -1,0 +1,45 @@
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "eric-esoa-dr-service.name" . }}
+  labels:
+  {{- include "eric-esoa-dr-service.labels" . | nindent 4 }}
+  {{- include "eric-esoa-so-library-chart.bamPartofLabel" .| nindent 4 }}
+  annotations:
+  {{- include "eric-esoa-dr-service.annotations" . | nindent 4 }}
+  {{- include "eric-esoa-so-library-chart.bamDiscoveryAnnotation" .| nindent 4 }}
+spec:
+  {{- if .Values.global }}
+  {{- if .Values.global.internalIPFamily }}
+  ipFamilies: [{{ .Values.global.internalIPFamily | quote }}]
+  {{- end }}
+  {{- end }}
+  ports:
+  {{- if eq (include "eric-esoa-so-library-chart.global-security-tls-enabled" .) "true" }}
+    - name: https-tls
+      port: {{ .Values.service.port.https }}
+      targetPort: {{ .Values.server.port.https }}
+  {{- else }}
+    - name: http
+      port: {{ .Values.service.port.http }}
+      targetPort: {{ .Values.server.port.http }}
+  {{- end }}
+  selector:
+    app: {{ .Chart.Name }}

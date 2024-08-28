@@ -1,0 +1,38 @@
+name: "application_1"
+description: "invalid schema - resourceName missing"
+jobs:
+  - name: job1
+    description: "test job"
+    discover:
+      source:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            # url absent, so resource name is required
+            subsystemName: dummyEnm
+            resource:
+              resourceConfigurationName: dummyResourceConfiguration
+          postFunction: ~
+          mapping:
+            id: .id
+            name: .name
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+            arg: 'id:id'
+          filterMatchText: "Source missing in target"
+          reconcileAction: action1
+    reconcile:
+      target:
+        reconcileActions:
+          action1:
+            type: shell
+            command: reconcile.sh
+            outputFormat: json
+            mapping:
+              id: .id
+              name: .name

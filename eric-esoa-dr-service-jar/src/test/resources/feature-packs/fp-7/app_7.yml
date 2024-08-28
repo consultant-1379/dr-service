@@ -1,0 +1,60 @@
+name: "application_7"
+description: |
+  - Job using shell executor
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      source:
+        fetchAction:
+          type: shell
+          preFunction: ~
+          command: |
+            echo '[{\"id\": \"1\", \"name\": \"object1\"}, {\"id\": \"2\", \"name\": \"object2\"}]'
+          outputFormat: json
+          # postFunction to support execution via powershell and bash. powershell requires quotes
+          # to be escaped whereas echo does not. this function will remove the escape characters from the echo output.
+          postFunction: '{{originalOutputs | replace("\\\"", "\"")}}'
+          mapping:
+            id: .id
+            name: .name
+        enrichAction: ~
+      target:
+        fetchAction:
+          type: shell
+          preFunction: ~
+          command: |
+            echo '[{\"id\": \"1\", \"name\": \"object1\"}]'
+          outputFormat: json
+          postFunction: '{{originalOutputs | replace("\\\"", "\"")}}'
+          mapping:
+            id: .id
+            name: .name
+        enrichAction: ~
+      linkSourceAndTarget: 'id:id'
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+            arg: 'id:id'
+          filterMatchText: 'Missing in Target'
+          reconcileAction: default
+    reconcile:
+      source:
+        enrichAction: ~
+      target:
+        enrichAction: ~
+        reconcileActions:
+          default:
+            type: shell
+            preFunction: ~
+            command: |
+              echo '{\"result\": \"SUCCESS\"}'
+            outputFormat: json
+            postFunction: '{{originalOutputs | replace("\\\"", "\"")}}'
+            mapping:
+              result: .result

@@ -1,0 +1,10 @@
+{
+    "items": [
+        {
+            "id": "\\d+",
+            "name": "inputs_1",
+            "description": "inputs"
+        }
+    ],
+    "totalCount": 1
+}

@@ -1,0 +1,63 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Missing in Target",
+        "Missing in Target"
+      ],
+      "properties": {
+        "name": "object1",
+        "id": "1"
+      },
+      "filters": [
+        {
+          "name": "filter2",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "NOT_STARTED"
+          }
+        },
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-23/reconcile/1\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        }
+      ],
+      "status": "PARTIALLY_RECONCILED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Target",
+        "Missing in Target"
+      ],
+      "properties": {
+        "name": "object2",
+        "id": "2"
+      },
+      "filters": [
+        {
+          "name": "filter2",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "NOT_STARTED"
+          }
+        },
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-23/reconcile/2\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        }
+      ],
+      "status": "PARTIALLY_RECONCILED"
+    }
+  ],
+  "totalCount": 2
+}

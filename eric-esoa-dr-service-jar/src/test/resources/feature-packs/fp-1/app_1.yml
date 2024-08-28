@@ -1,0 +1,76 @@
+name: "application_1"
+description: "application"
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: input1
+          mandatory: true
+      source:
+          fetchAction:
+            type: shell
+            preFunction: ~
+            command: |
+              echo '[{\"id\": \"1\", \"name\": \"object1\"}, {\"id\": \"2\", \"name\": \"object2\"}]'
+            outputFormat: json
+            postFunction: '{{originalOutputs | replace("\\\"", "\"")}}'
+            mapping:
+              id: .id
+              name: .name
+          enrichAction: ~
+      target:
+          fetchAction:
+            type: shell
+            preFunction: ~
+            command: |
+              echo '[{\"id\": \"1\", \"name\": \"object1\"}]'
+            outputFormat: json
+            postFunction: '{{originalOutputs | replace("\\\"", "\"")}}'
+            mapping:
+              id: .id
+              name: .name
+          enrichAction: ~
+      linkSourceAndTarget: 'id:id'
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+            arg: 'id:id'
+          filterMatchText: 'Missing in Source'
+          reconcileAction: action1
+        filter2:
+          condition:
+            name: sourceInTarget
+            arg: 'id:id'
+          filterMatchText: 'Found in Source'
+          reconcileAction: action2
+    reconcile:
+      inputs:
+        - name: reconcileInput1
+          mandatory: false
+      source:
+          enrichAction: ~
+      target:
+          enrichAction: ~
+          reconcileActions:
+            action1:
+                type: shell
+                preFunction: ~
+                command: reconcile.sh {payload}
+                outputFormat: json
+                postFunction: ~
+                mapping:
+                  result: .result
+            action2:
+                type: shell
+                preFunction: ~
+                command: reconcile2.sh {payload}
+                outputFormat: json
+                postFunction: ~
+                mapping:
+                  result: .result

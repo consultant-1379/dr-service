@@ -1,0 +1,110 @@
+name: "application_20"
+description: |
+  - Conditions are matched based on the linked sources and targets.
+jobs:
+  - name: job1
+    description: 'test job'
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: sourcesUrl
+          mandatory: true
+        - name: targetsUrl
+          mandatory: true
+      source:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.sourcesUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          postFunction: ~
+          mapping:
+            id: .id
+            name: .name
+            prop1: .prop1
+        enrichAction: ~
+      target:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          postFunction: ~
+          properties:
+            url: "{{inputs.targetsUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          mapping:
+            id: .id
+            name: .name
+            prop1: .prop1
+        enrichAction: ~
+      linkSourceAndTarget: 'id:id&name:name'
+      filters:
+        filter1:
+          condition:
+            name: sourceInTarget
+            arg: 'prop1:prop1'
+          filterMatchText: 'Found in Target'
+          reconcileAction: action1
+        filter2:
+          condition:
+            name: sourceNotInTarget
+          filterMatchText: 'Missing in Target'
+          reconcileAction: action1
+        filter3:
+          condition:
+            name: sourceMismatchedInTarget
+            arg: 'prop1:prop1'
+          filterMatchText: 'Mismatched in Target'
+          reconcileAction: action1
+        filter4:
+          condition:
+            name: targetNotInSource
+          filterMatchText: 'Missing in Source'
+          reconcileAction: action2
+
+    reconcile:
+      inputs:
+        - name: reconcileUrl
+          mandatory: true
+      source:
+        enrichAction: ~
+      target:
+        enrichAction: ~
+        reconcileActions:
+          action1:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputs.reconcileUrl}}/{{source.id}}"
+              method: POST
+              headers:
+                Content-Type: [ "application/json" ]
+              postFunction: ~
+            mapping:
+              result: .result
+          action2:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputs.reconcileUrl}}/{{target.id}}"
+              method: POST
+              headers:
+                Content-Type: [ "application/json" ]
+              postFunction: ~
+            mapping:
+              result: .result

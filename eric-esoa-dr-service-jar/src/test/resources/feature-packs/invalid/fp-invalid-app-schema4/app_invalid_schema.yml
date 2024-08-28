@@ -1,0 +1,25 @@
+name: "application_1"
+description: "invalid schema - no filters defined"
+jobs:
+  - name: job1
+    description: "test job"
+    discover:
+      source:
+        fetchAction:
+          type: shell
+          command: cat sources.json
+          outputFormat: json
+          mapping:
+            id: .id
+            name: .name
+      filters: ~
+    reconcile:
+      target:
+        reconcileActions:
+          action1:
+            type: shell
+            command: reconcile.sh
+            outputFormat: json
+            mapping:
+              id: .id
+              name: .name

@@ -1,0 +1,13 @@
+{
+  "job": {
+    "inputs": {
+      "reconcileUrl": "http://localhost:8081/fp-6/reconcile",
+      "sourcesUrl": "http://localhost:8081/fp-6/sources"
+    },
+    "name": "listener_5-job1",
+    "description": "Triggered by listener listener_5 with condition 'jq(.request.eventType == \"CREATE\")' ",
+    "applicationJobName": "job1",
+    "status": "COMPLETED"
+  },
+  "outputs": {}
+}

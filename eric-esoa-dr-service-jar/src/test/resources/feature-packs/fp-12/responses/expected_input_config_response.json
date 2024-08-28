@@ -1,0 +1,27 @@
+{
+    "id": "\\d+",
+    "name": "inputs_12",
+    "description": "inputs",
+    "inputs": [
+        {
+            "name": "input1",
+            "value": "value1",
+            "pickList": null
+        },
+        {
+            "name": "input2",
+            "value": null,
+            "pickList": ["subsystem_1", "subsystem_2"]
+        },
+        {
+            "name": "input3",
+            "value": null,
+            "pickList": [1,2,3]
+        },
+        {
+            "name": "input4",
+            "value": null,
+            "pickList": ["subsystem_1"]
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+name: "application_1"
+description: "invalid schema - job name not defined"
+jobs:
+  - description: "test job"
+    discover:
+      source:
+        fetchAction:
+          type: shell
+          command: cat sources.json
+          outputFormat: json
+          mapping:
+            id: .id
+            name: .name
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+            arg: 'id:id'
+          filterMatchText: "Source missing in target"
+          reconcileAction: action1
+    reconcile:
+      target:
+        reconcileActions:
+          action1:
+            type: shell
+            command: reconcile.sh
+            outputFormat: json
+            mapping:
+              id: .id
+              name: .name

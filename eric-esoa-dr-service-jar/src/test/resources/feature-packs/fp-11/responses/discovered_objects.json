@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "targetId": "4",
+        "targetName": "object4"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "default",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "targetId": "5",
+        "targetName": "object5"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "default",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    }
+  ],
+  "totalCount": 2
+}

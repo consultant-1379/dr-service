@@ -1,0 +1,95 @@
+name: "application_4"
+description: |
+    - Creates mapping between source and target objects
+    - Target properties are used for substitution during Reconcile
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: sourcesUrl
+          mandatory: true
+        - name: targetsUrl
+          mandatory: true
+      source:
+        fetchAction:
+            type: rest
+            preFunction: ~
+            outputFormat: json
+            properties:
+              url: "{{inputs.sourcesUrl}}"
+              method: GET
+              headers:
+                Content-Type: [ "application/json" ]
+            postFunction: ~
+            mapping:
+              id: .id
+              name: .name
+        enrichAction: ~
+      target:
+        fetchAction:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            postFunction: ~
+            properties:
+              url: "{{inputs.targetsUrl}}"
+              method: GET
+              headers:
+                Content-Type: [ "application/json" ]
+            mapping:
+              id: .id
+              name: .name
+              version: .version
+              reconcilePathSegment: .reconcilePathSegment
+        enrichAction: ~
+      linkSourceAndTarget: 'id:id&name:name'
+      filters:
+        filter1:
+          condition:
+            name: sourceInTarget
+            arg: 'id:id'
+          filterMatchText: 'Found in Source'
+          reconcileAction: default
+    reconcile:
+      target:
+          enrichAction:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputs.enrichUrl}}/{{target.id}}"
+              method: GET
+              headers:
+                Content-Type: [ "application/json" ]
+            postFunction: ~
+            mapping:
+              status: .status
+          reconcileActions:
+            default:
+                  type: rest
+                  preFunction: |
+                    { 
+                        "status": "{{ target.status }}"
+                    }
+                  command: ""
+                  outputFormat: json
+                  properties:
+                      url: "{{inputs.reconcileUrl}}/{{source.id}}"
+                      method: POST
+                      headers:
+                          Content-Type: [ "application/json" ]
+                      body: |
+                        { 
+                          "target_status": "{{ preFunction.status }}"
+                          "target_name": "{{ target.name}}"
+                        }
+                  postFunction: ~
+                  mapping:
+                      result: .result

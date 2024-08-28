@@ -1,0 +1,15 @@
+{
+  "job": {
+    "inputs": {
+      "reconcileUrl": "http://localhost:8081/fp-6/reconcile",
+      "targetsUrl": "http://localhost:8081/fp-6/targets",
+      "sourcesUrl": "http://localhost:8081/fp-6/sources",
+      "enrichUrl": "http://localhost:8081/fp-6/enrich"
+    },
+    "name": "listener_3-job1",
+    "description": "Triggered by listener listener_3 with condition 'jinja({{request.eventType=='CREATE'}})' ",
+    "applicationJobName": "job1",
+    "status": "COMPLETED"
+  },
+  "outputs": {}
+}

@@ -1,0 +1,93 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "name": "object7",
+        "id": "7"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "FAILED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-2/reconcile/7\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "not_json_string",
+            "errorMessage": "DR-20:Execution step 'JsonMappingStep' failed: 'com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'not_json_string': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n at [Source: (String)\"not_json_string\"; line: 1, column: 16]'."
+          }
+        }
+      ],
+      "status": "RECONCILE_FAILED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "name": "object8",
+        "id": "8"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "FAILED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-2/reconcile/8\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "not_json_string",
+            "errorMessage": "DR-20:Execution step 'JsonMappingStep' failed: 'com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'not_json_string': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n at [Source: (String)\"not_json_string\"; line: 1, column: 16]'."
+          }
+        }
+      ],
+      "status": "RECONCILE_FAILED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "name": "object9",
+        "id": "9"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "FAILED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-2/reconcile/9\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "not_json_string",
+            "errorMessage": "DR-20:Execution step 'JsonMappingStep' failed: 'com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'not_json_string': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n at [Source: (String)\"not_json_string\"; line: 1, column: 16]'."
+          }
+        }
+      ],
+      "status": "RECONCILE_FAILED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "name": "object10",
+        "id": "10"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "FAILED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-2/reconcile/10\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "not_json_string",
+            "errorMessage": "DR-20:Execution step 'JsonMappingStep' failed: 'com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'not_json_string': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n at [Source: (String)\"not_json_string\"; line: 1, column: 16]'."
+          }
+        }
+      ],
+      "status": "RECONCILE_FAILED"
+    }
+  ],
+  "totalCount": 4
+}

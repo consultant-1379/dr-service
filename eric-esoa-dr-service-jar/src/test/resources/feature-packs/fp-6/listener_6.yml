@@ -1,0 +1,14 @@
+name: listener_6
+description: "test properties substitution in listener configuration"
+triggers:
+  - condition: jinja({{request.eventType==properties.prop2}})
+    applicationName: application_5
+    jobName: job1
+    inputs:
+      reconcileUrl: jq(.request.reconcileUrl)
+      sourcesUrl: jq(.request.sourcesUrl)
+      targetsUrl: jq(.request.targetsUrl)
+      enrichUrl: jq(.request.enrichUrl)
+      input1: jinja({{properties.prop1}})
+outputs:
+  output1: jinja({{properties.prop3}})

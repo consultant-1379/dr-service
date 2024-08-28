@@ -1,0 +1,118 @@
+{
+  "id": "\\d+",
+  "name": "application_1",
+  "description": "application",
+  "jobs": [
+    {
+      "name": "job1",
+      "description": "test job",
+      "discover": {
+        "inputs": [
+          {
+            "name": "input1",
+            "mandatory": true,
+            "description": null
+          }
+        ],
+        "source": {
+          "fetchAction": {
+            "type": "shell",
+            "preFunction": null,
+            "outputFormat": "json",
+            "postFunction": "{{originalOutputs | replace(\"\\\\\\\"\", \"\\\"\")}}",
+            "mapping": {
+              "id": ".id",
+              "name": ".name"
+            },
+            "command": "echo '[{\\\"id\\\": \\\"1\\\", \\\"name\\\": \\\"object1\\\"}, {\\\"id\\\": \\\"2\\\", \\\"name\\\": \\\"object2\\\"}]'\n",
+            "properties": {}
+          },
+          "enrichAction": null
+        },
+        "target": {
+          "fetchAction": {
+            "type": "shell",
+            "preFunction": null,
+            "outputFormat": "json",
+            "postFunction": "{{originalOutputs | replace(\"\\\\\\\"\", \"\\\"\")}}",
+            "mapping": {
+              "id": ".id",
+              "name": ".name"
+            },
+            "command": "echo '[{\\\"id\\\": \\\"1\\\", \\\"name\\\": \\\"object1\\\"}]'\n",
+            "properties": {}
+          },
+          "enrichAction": null
+        },
+        "linkSourceAndTarget": "id:id",
+        "filters": {
+          "filter1": {
+            "condition": {
+              "name": "sourceNotInTarget",
+              "arg": "id:id"
+            },
+            "reconcileAction": "action1",
+            "filterMatchText": "Missing in Source"
+          },
+          "filter2": {
+            "condition": {
+              "name": "sourceInTarget",
+              "arg": "id:id"
+            },
+            "reconcileAction": "action2",
+            "filterMatchText": "Found in Source"
+          }
+        }
+      },
+      "reconcile": {
+        "inputs": [
+          {
+            "name": "reconcileInput1",
+            "mandatory": false,
+            "description": null
+          }
+        ],
+        "source": {
+          "enrichAction": null
+        },
+        "target": {
+          "enrichAction": null,
+          "reconcileActions": {
+            "action1": {
+              "type": "shell",
+              "preFunction": null,
+              "outputFormat": "json",
+              "postFunction": null,
+              "mapping": {
+                "result": ".result"
+              },
+              "command": "reconcile.sh {payload}",
+              "properties": {}
+            },
+            "action2": {
+              "type": "shell",
+              "preFunction": null,
+              "outputFormat": "json",
+              "postFunction": null,
+              "mapping": {
+                "result": ".result"
+              },
+              "command": "reconcile2.sh {payload}",
+              "properties": {}
+            }
+          }
+        }
+      },
+      "api": {
+        "properties": [
+          {
+            "name": "id"
+          },
+          {
+            "name": "name"
+          }
+        ]
+      }
+    }
+  ]
+}

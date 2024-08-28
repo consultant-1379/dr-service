@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "name": "mtls_broker_bad",
+        "subsystemType": {
+            "id": 2,
+            "type": "KAFKA"
+        },
+        "connectionProperties": [
+            {
+                "bootstrapServer": "{{brokerUrl}}",
+                "ssl.enabled": true,
+                "ssl.trustStoreSecretName": "truststore_secret",
+                "ssl.trustStorePassword": "password"
+            }
+        ]
+    }
+]

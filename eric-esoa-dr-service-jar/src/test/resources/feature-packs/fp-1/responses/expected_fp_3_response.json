@@ -1,0 +1,26 @@
+{
+  "items": [
+    {
+      "id": "\\d+",
+      "name": "fp-1",
+      "description": "test feature pack",
+      "createdAt": ".+",
+      "modifiedAt": ".+"
+    },
+    {
+      "id": "\\d+",
+      "name": "fp-2",
+      "description": "test feature pack",
+      "createdAt": ".+",
+      "modifiedAt": ".+"
+    },
+    {
+      "id": "\\d+",
+      "name": "fp-3",
+      "description": "test feature pack",
+      "createdAt": ".+",
+      "modifiedAt": ".+"
+    }
+  ],
+  "totalCount": 3
+}

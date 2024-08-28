@@ -1,0 +1,49 @@
+{
+  "id": "\\d+",
+  "name": "%NAME%",
+  "description": "test feature pack",
+  "createdAt": ".+",
+  "modifiedAt": ".+",
+  "applications": [
+    {
+      "id": "\\d+",
+      "name": "application_1",
+      "description": "application"
+    }
+  ],
+  "assets": [
+    {
+      "id": "\\d+",
+      "name": "asset_1.j2",
+      "description": null
+    }
+  ],
+  "listeners": [
+    {
+      "id": "\\d+",
+      "name": "listener_1",
+      "description": "listener"
+    }
+  ],
+  "properties": [
+    {
+      "name":"prop1",
+      "value":"value1"
+    },
+    {
+      "name":"prop2",
+      "value":2
+    },
+      {
+          "name": "prop3",
+          "value": false
+      }
+      ],
+  "inputs": [
+    {
+      "id": "\\d+",
+      "name": "inputs_1",
+      "description": "inputs"
+    }
+  ]
+}

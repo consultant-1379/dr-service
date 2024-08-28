@@ -1,0 +1,90 @@
+{
+  "commitMessagePrefix": "3PP Robot: ",
+  "prConcurrentLimit": 10,
+  "reviewers": ["handong.wang@ericsson.com",
+                "bert.schnieders@ericsson.com",
+                "brian.kelly@ericsson.com",
+                "ciaran.kelly@ericsson.com",
+                "cormac.mcswiney@ericsson.com",
+                "paul.doyle@ericsson.com",
+                "paul.kirwan@ericsson.com"],
+  "baseBranches": ["d3ppRobot"],
+  "enabledManagers": [
+    "scas-maven"
+  ],
+  "extends": ["group:allNonMajor"],
+  "packageRules": [
+    {
+      "matchManagers": ["scas-maven"],
+      "groupName": "dependencies in scas-maven",
+      "groupSlug": "all-scas-maven"
+    },
+    {
+      "description": "Ignore dependencies for test scope and plugins",
+      "matchManagers": ["scas-maven"],
+      "matchDepTypes": ["test", "build"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore major Jetty dependencies update to 12. Wiremock is incompatible with Jetty 12 that comes with Spring Boot 3.2.2",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": [
+        "org.eclipse.jetty:jetty-http",
+        "org.eclipse.jetty:jetty-io",
+        "org.eclipse.jetty:jetty-security",
+        "org.eclipse.jetty:jetty-util"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Ignore groovy-all dependency. Wrong version picked up. Available latest version in SCAS 4.0.18 can not be downloaded from EO Repo.",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": ["org.codehaus.groovy:groovy-all"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore Google Guava library. Latest version 33.2.1 can not be downloaded from EO Repo.",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": ["com.google.guava:guava"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore JSON library. Latest version 20240303 marked as low community activity in SCAS. Prefer version 20231013.",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": ["org.json:json"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore Jaeger client dependency. Wrong version picked up.",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": ["io.jaegertracing:jaeger-client"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore JSON Schema Validator. Wrong version picked up. ",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": ["com.networknt:json-schema-validator"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore jQuery dependency. Wrong version picked up.",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": ["org.webjars:jquery"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore Kubernetes Java client. Wrong version picked up. ",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": ["io.kubernetes:client-java"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore Swagger annotations. Latest version 2.2.12 can not be downloaded from EO Repo. ",
+      "matchManagers": ["scas-maven"],
+      "matchPackageNames": [
+        "io.swagger:swagger-annotations"
+      ],
+      "enabled": false
+    }
+  ]
+}

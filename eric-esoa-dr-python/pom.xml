@@ -1,0 +1,101 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ ~ COPYRIGHT Ericsson 2023
+ ~
+ ~
+ ~
+ ~ The copyright to the computer program(s) herein is the property of
+ ~
+ ~ Ericsson Inc. The programs may be used and/or copied only with written
+ ~
+ ~ permission from Ericsson Inc. or in accordance with the terms and
+ ~
+ ~ conditions stipulated in the agreement/contract under which the
+ ~
+ ~ program(s) have been supplied.
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ericsson.bos.dr</groupId>
+        <artifactId>eric-esoa-dr-service</artifactId>
+        <version>1.6.8-1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>eric-esoa-dr-python</artifactId>
+    <packaging>pom</packaging>
+    <name>Discovery and Reconciliation Python library</name>
+
+    <properties>
+        <maven.install.skip>true</maven.install.skip>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id> <!-- disable maven default deploy -->
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-plugin.version}</version>
+                <configuration>
+                    <environmentVariables>
+                        <DOCKER_HOST/>
+                        <DOCKER_TLS_VERIFY/>
+                        <DOCKER_CERT_PATH/>
+                    </environmentVariables>
+                    <useMavenLogger>true</useMavenLogger>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pylint</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <executable>bash</executable>
+                            <commandlineArgs>-c "scripts/pylint.sh"</commandlineArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>python-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <executable>bash</executable>
+                            <commandlineArgs>-c "scripts/package.sh ${project.version}"</commandlineArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>python-publish</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <executable>bash</executable>
+                            <commandlineArgs>-c "scripts/publish.sh ${project.version}"</commandlineArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

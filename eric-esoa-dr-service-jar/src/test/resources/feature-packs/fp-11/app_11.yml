@@ -1,0 +1,78 @@
+name: "application_11"
+description: |
+  - Test targetNotInSource filter
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: targetId
+        - name: targetName
+    discover:
+      inputs:
+        - name: sourcesUrl
+          mandatory: true
+        - name: targetsUrl
+          mandatory: true
+      source:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.sourcesUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          postFunction: ~
+          mapping:
+            sourceId: .id
+            sourceName: .name
+        enrichAction: ~
+      target:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          postFunction: ~
+          properties:
+            url: "{{inputs.targetsUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          mapping:
+            targetId: .id
+            targetName: .name
+        enrichAction: ~
+      linkSourceAndTarget: 'sourceId:targetId'
+      filters:
+        filter1:
+          condition:
+            name: targetNotInSource
+            arg: 'sourceId:targetId'
+          filterMatchText: 'Missing in Source'
+          reconcileAction: default
+    reconcile:
+      inputs:
+        - name: reconcileUrl
+          mandatory: true
+      source:
+        enrichAction: ~
+      target:
+        enrichAction: ~
+        reconcileActions:
+          default:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputs.reconcileUrl}}/{{target.targetId}}"
+              method: POST
+              headers:
+                Content-Type: [ "application/json" ]
+            postFunction: ~
+            mapping:
+              result: .result

@@ -1,0 +1,69 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Missing in Target",
+        "Missing in Target"
+      ],
+      "properties": {
+        "name": "object1",
+        "id": "1"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-23/reconcile/1\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        },
+        {
+          "name": "filter2",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "FAILED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-23/reconcile/1\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "Test Error!!!",
+            "errorMessage": "DR-20:Execution step 'CommandStep' failed: 'Command 'Method: POST\nURL: http://localhost:8081/fp-23/reconcile/1\nHeaders: [Content-Type:\"application/json\"]' failed with output 'Test Error!!!''."
+          }
+        }
+      ],
+      "status": "PARTIALLY_RECONCILED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Target",
+        "Missing in Target"
+      ],
+      "properties": {
+        "name": "object2",
+        "id": "2"
+      },
+      "filters": [
+        {
+          "name": "filter2",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "FAILED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-23/reconcile/2\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "Test Error!!!",
+            "errorMessage": "DR-20:Execution step 'CommandStep' failed: 'Command 'Method: POST\nURL: http://localhost:8081/fp-23/reconcile/2\nHeaders: [Content-Type:\"application/json\"]' failed with output 'Test Error!!!''."
+          }
+        },
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-23/reconcile/2\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        }
+      ],
+      "status": "PARTIALLY_RECONCILED"
+    }
+  ],
+  "totalCount": 2
+}

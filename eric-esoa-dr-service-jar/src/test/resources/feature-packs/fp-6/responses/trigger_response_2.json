@@ -1,0 +1,18 @@
+{
+  "job": {
+    "inputs": {
+      "reconcileUrl": "http://localhost:8081/fp-6/reconcile",
+      "sourcesUrl": "http://localhost:8081/fp-6/sources"
+    },
+    "name": "listener_2-job1",
+    "description": "Triggered by listener listener_2 with condition 'jinja({{request.eventType=='CREATE'}})' ",
+    "applicationJobName": "job1",
+    "status": "COMPLETED"
+  },
+  "outputs": {
+    "reconcileCommandOutput": {"result": "SUCCESS"},
+    "reconcileCommand": "Method: POST\nURL: http://localhost:8081/fp-6/reconcile/1\nHeaders: [Content-Type:\"application/json\"]",
+    "eventType": "CREATE",
+    "discoveryObjectStatus": "RECONCILED"
+  }
+}

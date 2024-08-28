@@ -1,0 +1,5 @@
+name: inputs_1_duplicate
+description: inputs
+inputs:
+  - name: input1
+    value: value1

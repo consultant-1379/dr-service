@@ -1,0 +1,79 @@
+name: "application_8"
+description: |
+  - Application that uses groovy script in jinja substitution.
+  - Substitutes the sources/targets/reconcile url.
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: sourcesUrl
+          mandatory: true
+        - name: targetsUrl
+          mandatory: true
+      source:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{fn:groovy('arg1[arg2]', inputs, 'sourcesUrl')}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          postFunction: ~
+          mapping:
+            id: .id
+            name: .name
+        enrichAction: ~
+      target:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          postFunction: ~
+          properties:
+            url: "{{fn:groovy('@getUrl_asset.groovy', inputs, 'targetsUrl')}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          mapping:
+            id: .id
+            name: .name
+        enrichAction: ~
+      linkSourceAndTarget: 'id:id'
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+            arg: 'id:id'
+          filterMatchText: 'Missing in Target'
+          reconcileAction: default
+    reconcile:
+      inputs:
+        - name: reconcileUrl
+          mandatory: true
+      source:
+        enrichAction: ~
+      target:
+        enrichAction: ~
+        reconcileActions:
+          default:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{fn:groovy('@getUrl_asset.groovy', inputs, 'reconcileUrl')}}/{{source.id}}"
+              method: POST
+              headers:
+                Content-Type: [ "application/json" ]
+            postFunction: ~
+            mapping:
+              result: .result

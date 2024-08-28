@@ -1,0 +1,34 @@
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eric-bos-dr"
+description = "Discovery and Reconciliation Python library"
+requires-python = ">=3"
+dependencies = ["requests"]
+dynamic = ['version', 'readme']
+authors = [ ]
+keywords = []
+classifiers = []
+license = {file = "license.txt"}
+
+[tool.setuptools.dynamic]
+version = {file = "version.txt"}
+readme = {file = "README.md", content-type = "text/markdown"}

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "name": "object1",
+    "status": "COMPLETED",
+    "version": "1.0",
+    "reconcilePathSegment": "reconcile"
+  },
+  {
+    "id": "2",
+    "name": "object2",
+    "status": "INPROGRESS",
+    "version": "2.0",
+    "reconcilePathSegment": "reconcile"
+  },
+  {
+    "id": "2",
+    "name": "object2",
+    "status": "INPROGRESS",
+    "version": "2.0",
+    "reconcilePathSegment": "reconcile"
+  }
+]

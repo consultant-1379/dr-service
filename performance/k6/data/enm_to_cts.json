@@ -1,0 +1,10 @@
+{
+  "drUrl": "http://eric-esoa-dr.imps3-haber003.ews.gic.ericsson.se",
+  "featurePackId": "1",
+  "applicationId": "1",
+  "applicationJobName": "gnbdu",
+  "jobInputs": {
+    "ENM_NODE_COUNT": "10",
+    "CTS_NODE_COUNT": "10"
+  }
+}

@@ -1,0 +1,83 @@
+name: "application_21"
+description: |
+  - preFunction and postFunction using a jinja script asset in the discovery and reconcile
+jobs:
+  - name: job1
+    description: 'test job'
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: sourcesUrl
+          mandatory: true
+        - name: targetsUrl
+          mandatory: true
+      source:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.sourcesUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          postFunction: '@asset_21_postFunction.j2'
+          mapping:
+            id: .id
+            name: .name
+            prop1: .prop1
+        enrichAction: ~
+      target:
+        fetchAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          postFunction: ~
+          properties:
+            url: "{{inputs.targetsUrl}}"
+            method: GET
+            headers:
+              Content-Type: [ "application/json" ]
+          mapping:
+            id: .id
+            name: .name
+            prop1: .prop1
+        enrichAction: ~
+      linkSourceAndTarget: 'id:id&name:name'
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+          filterMatchText: 'Missing in Target'
+          reconcileAction: action1
+    reconcile:
+      inputs:
+        - name: reconcileUrl
+          mandatory: true
+      source:
+        enrichAction: ~
+      target:
+        enrichAction: ~
+        reconcileActions:
+          action1:
+            type: rest
+            preFunction: '@asset_21_preFunction.j2'
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputs.reconcileUrl}}/{{source.id}}"
+              method: POST
+              headers:
+                Content-Type: [ "application/json" ]
+              body: |
+                {
+                  {{ preFunction }}
+                }
+            postFunction: ~
+            mapping:
+              result: .result

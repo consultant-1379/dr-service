@@ -1,0 +1,7 @@
+properties:
+  - name: prop1
+    value: 'input_value'
+  - name: prop2
+    value: 'CREATE'
+  - name: prop3
+    value: 'output_value'

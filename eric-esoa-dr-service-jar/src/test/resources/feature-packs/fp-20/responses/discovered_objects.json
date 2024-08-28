@@ -1,0 +1,81 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Found in Target"
+      ],
+      "properties": {
+        "name": "object1",
+        "id": "1"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    },
+    {
+      "discrepancies": [
+        "Mismatched in Target"
+      ],
+      "properties": {
+        "name": "object2",
+        "id": "2"
+      },
+      "filters": [
+        {
+          "name": "filter3",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Target"
+      ],
+      "properties": {
+        "name": "object3",
+        "id": "3"
+      },
+      "filters": [
+        {
+          "name": "filter2",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "name": "object100",
+        "id": "100"
+      },
+      "filters": [
+        {
+          "name": "filter4",
+          "reconcileAction": {
+            "name": "action2",
+            "status": "NOT_STARTED"
+          }
+        }
+      ],
+      "status": "DISCOVERED"
+    }
+  ],
+  "totalCount": 4
+}

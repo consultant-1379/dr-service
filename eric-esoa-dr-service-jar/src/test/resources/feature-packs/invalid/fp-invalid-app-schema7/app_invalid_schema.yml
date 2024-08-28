@@ -1,0 +1,24 @@
+name: "application_1"
+description: "invalid schema - reconcileActions not defined"
+jobs:
+  - name: job1
+    description: "test job"
+    discover:
+      source:
+        fetchAction:
+          type: shell
+          command: cat sources.json
+          outputFormat: json
+          mapping:
+            id: .id
+            name: .name
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+            arg: 'id:id'
+          filterMatchText: "Source missing in target"
+          reconcileAction: action1
+    reconcile:
+      target:
+        enrichAction: ~

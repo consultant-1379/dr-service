@@ -1,0 +1,58 @@
+name: "application_1"
+description: "application"
+jobs:
+  - name: job1
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: input1
+          mandatory: true
+      source:
+        fetchAction:
+          type: shell
+          preFunction: ~
+          command: cat sources.json
+          outputFormat: json
+          postFunction: ~
+          mapping:
+            id: .id
+            name: .name
+      target:
+        fetchAction:
+          type: shell
+          preFunction: ~
+          command: cat targets.json
+          outputFormat: json
+          postFunction: ~
+          mapping:
+            id: .id
+            name: .name
+      linkSourceAndTarget: 'id:id'
+      filters:
+        filter1:
+          condition:
+            name: sourceNotInTarget
+          filterMatchText: 'Missing in Source'
+          reconcileAction: action1
+        filter2:
+          condition:
+            name: sourceInTarget
+          filterMatchText: 'Found in Source'
+          reconcileAction: action1
+    reconcile:
+      inputs:
+        - name: reconcileInput1
+          mandatory: false
+      target:
+        reconcileActions:
+          action1:
+              type: shell
+              preFunction: '@transform.j2'
+              command: reconcile.sh {payload}
+              outputFormat: json
+              postFunction: ~
+              mapping:
+                result: .result

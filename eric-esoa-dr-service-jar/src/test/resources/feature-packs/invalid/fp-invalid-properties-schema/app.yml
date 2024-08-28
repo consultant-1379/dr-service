@@ -1,0 +1,19 @@
+name: "application"
+description: "application"
+jobs:
+  job1:
+    discover:
+      source:
+        actions:
+          fetch:
+            type: shell
+            preFunction: ~
+            command: cat sources.json
+            outputFormat: json
+            postFunction: ~
+            mapping:
+              id: .id
+              name: .name
+      outputs:
+        - name: id
+        - name: name

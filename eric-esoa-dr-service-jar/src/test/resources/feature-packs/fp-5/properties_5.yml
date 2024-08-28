@@ -1,0 +1,23 @@
+properties:
+  - name: sourcesPathSegment_1
+    value: fp-5
+  - name: sourcesPathSegment_2
+    value: sources
+  - name: targetsPathSegment_1
+    value: fp-5
+  - name: targetsPathSegment_2
+    value: targets
+  - name: reconcilePathSegment
+    value: fp-5/reconcile
+  - name: header
+    value: application/json
+  - name: enrichUrl
+    value: fp-5/enrich/
+  - name: preFunction
+    value: "prefunction content"
+  - name: content
+    value: "properties content"
+  - name: enrich_key
+    value: "state"
+  - name: enrich_value
+    value: "Active"

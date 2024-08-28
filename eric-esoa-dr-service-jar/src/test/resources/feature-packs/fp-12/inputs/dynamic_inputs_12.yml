@@ -1,0 +1,51 @@
+name: inputs_12
+description: inputs
+inputs:
+  - name: input1
+    value: value1
+  - name: input2
+    pickList: |
+        {%- set executionOption -%}
+        {
+          "type":"rest",
+          "command":"",
+          "outputFormat":"json",
+          "properties":{
+              "url":"WIREMOCK_URL/subsystem-management-api/subsystem-manager/v2/subsystems",
+              "method":"GET",
+              "headers":{
+                  "Content-Type":[
+                      "application/json"
+                  ]
+              }
+          },
+          "mapping":{
+              "value":".name"
+          }
+        }
+        {%- endSet -%}
+        {{fn:execute(executionOption)}}
+  - name: input3
+    pickList: [1,2,3]
+  - name: input4
+    pickList: |
+        {%- set executionOption -%}
+        {
+          "type":"rest",
+          "command":"",
+          "outputFormat":"json",
+          "properties":{
+              "url":"WIREMOCK_URL/subsystem-management-api/subsystem-manager/v2/subsystems",
+              "method":"GET",
+              "headers":{
+                  "Content-Type":[
+                      "application/json"
+                  ]
+              }
+          },
+          "mapping":{
+              "value":"select(.name| startswith (\"subsystem_1\"))|.name"
+          }
+        }
+        {%- endSet -%}
+        {{fn:execute(executionOption)}}

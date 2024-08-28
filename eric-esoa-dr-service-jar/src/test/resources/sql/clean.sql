@@ -1,0 +1,14 @@
+DELETE FROM filter;
+DELETE FROM discovered_object;
+DELETE FROM job;
+DELETE FROM application;
+DELETE FROM asset;
+DELETE FROM properties;
+DELETE FROM inputs;
+DELETE FROM listener;
+DELETE FROM feature_pack;
+DELETE FROM filter;
+DELETE FROM discovered_object;
+DELETE FROM job_schedule;
+DELETE FROM listener_message_subscription;
+DELETE FROM job_specification;

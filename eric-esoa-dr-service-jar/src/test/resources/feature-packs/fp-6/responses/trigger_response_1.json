@@ -1,0 +1,12 @@
+{
+  "job": {
+    "inputs": {
+      "reconcileUrl": "http://localhost:8081/fp-6/reconcile",
+      "sourcesUrl": "http://localhost:8081/fp-6/sources"
+    },
+    "name": "listener_1-job1",
+    "description": "Triggered by listener listener_1 with condition 'jinja({{request.eventType=='CREATE'}})' ",
+    "status": "COMPLETED"
+  },
+  "outputs": {}
+}

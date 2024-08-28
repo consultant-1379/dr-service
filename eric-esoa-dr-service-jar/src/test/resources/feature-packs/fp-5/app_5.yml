@@ -1,0 +1,150 @@
+name: "application_5"
+description: |
+  - Test properties substitution
+  - Test job substitution
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: id
+        - name: name
+        - name: state
+    discover:
+      inputs:
+        - name: baseUrl
+          mandatory: true
+      source:
+        fetchAction:
+          type: rest
+          preFunction: |
+            {
+              "sourcesPathSegment_1": "{{properties.sourcesPathSegment_1}}",
+              "jobName": "{{job.name}}"
+            }
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.baseUrl}}/{{preFunction.sourcesPathSegment_1}}/{{properties.sourcesPathSegment_2}}"
+            method: POST
+            headers:
+              Content-Type: [ "{{properties.header}}" ]
+            body: |
+                {
+                  "jobName": "{{preFunction.jobName}}",
+                  "featurePackId": "{{job.featurePack.id}}",
+                  "featurePackName": "{{job.featurePack.name}}"
+                }
+          postFunction:  ~
+          mapping:
+            id: .id
+            name: .name
+        enrichAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.baseUrl}}/{{properties.enrichUrl}}/{{source.id}}"
+            method: GET
+            headers:
+              Content-Type: [ "{{properties.header}}" ]
+            postFunction: ~
+          mapping:
+            state: .state
+      target:
+        fetchAction:
+          type: rest
+          preFunction: |
+            {
+              "targetsPathSegment_1": "{{properties.targetsPathSegment_1}}"
+            }
+          command: ""
+          outputFormat: json
+          postFunction: ~
+          properties:
+            url: "{{inputs.baseUrl}}/{{preFunction.targetsPathSegment_1}}/{{properties.targetsPathSegment_2}}"
+            method: GET
+            headers:
+              Content-Type: [ "{{properties.header}}" ]
+          mapping:
+            id: .id
+            name: .name
+        enrichAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.baseUrl}}/{{properties.enrichUrl}}/{{target.id}}"
+            method: GET
+            headers:
+              Content-Type: [ "{{properties.header}}" ]
+            postFunction: ~
+          mapping:
+            state: .state
+      linkSourceAndTarget: 'id:id'
+      filters:
+        filter1:
+          condition:
+            name: sourceInTarget
+            arg: 'id:id'
+          filterMatchText: 'Found in Source'
+          reconcileAction: action1
+    reconcile:
+      source:
+        enrichAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.baseUrl}}/{{properties.enrichUrl}}/{{source.id}}"
+            method: GET
+            headers:
+              Content-Type: [ "{{properties.header}}" ]
+          postFunction: ~
+          mapping:
+            status: .status
+      target:
+        enrichAction:
+          type: rest
+          preFunction: ~
+          command: ""
+          outputFormat: json
+          properties:
+            url: "{{inputs.baseUrl}}/{{properties.enrichUrl}}/{{target.id}}"
+            method: GET
+            headers:
+              Content-Type: [ "{{properties.header}}" ]
+          postFunction: ~
+          mapping:
+            status: .status
+        reconcileActions:
+          action1:
+            type: rest
+            preFunction: |
+              {
+                  "content": "{{ properties.preFunction }}",
+                  "jobId": "{{job.id}}",
+                  "jobName": "{{job.name}}"
+              }
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputs.baseUrl}}/{{properties.reconcilePathSegment}}/{{source.id}}"
+              method: POST
+              headers:
+                Content-Type: [ "{{properties.header}}" ]
+              body: |
+                {
+                  "pre_context_content": "{{ preFunction.content }}",
+                  "properties_content": "{{properties.content}}",
+                  "jobId": {{preFunction.jobId}},
+                  "jobName": "{{preFunction.jobName}}",
+                  "featurePackId": {{job.featurePack.id}},
+                  "featurePackName": "{{job.featurePack.name}}"
+                }
+            postFunction: ~
+            mapping:
+              result: .result

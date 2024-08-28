@@ -1,0 +1,12 @@
+name: listener_3
+description: "test listener which fetches/enriches sources and targets"
+triggers:
+  - condition: jinja({{request.eventType=='CREATE'}})
+    applicationName: application_5_2
+    jobName: job1
+    inputs:
+      reconcileUrl: jq(.request.reconcileUrl)
+      sourcesUrl: jq(.request.sourcesUrl)
+      targetsUrl: jq(.request.targetsUrl)
+      enrichUrl: jq(.request.enrichUrl)
+

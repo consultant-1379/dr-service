@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "name": "object2",
+        "id": "2"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "default",
+            "status": "FAILED",
+            "errorMessage": "DR-20:Execution step 'CommandStep' failed: 'DR-19:Jinja Substitution failed: '[TemplateError{severity=FATAL, reason=SYNTAX_ERROR, item=OTHER, message='UnknownTokenException: Unknown token found: inputsXXX.reconcileUrl', fieldName='null', lineno=1, startPosition=1, scopeDepth=1, category=UNKNOWN, categoryErrors=null}]'.'."
+          }
+        }
+      ],
+      "status": "RECONCILE_FAILED"
+    }
+  ],
+  "totalCount": 1
+}

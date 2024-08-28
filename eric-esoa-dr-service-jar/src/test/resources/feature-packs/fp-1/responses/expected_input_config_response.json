@@ -1,0 +1,17 @@
+{
+    "id": "\\d+",
+    "name": "inputs_1",
+    "description": "inputs",
+    "inputs": [
+        {
+            "name": "input1",
+            "value": "value1",
+            "pickList": null
+        },
+        {
+            "name": "input2",
+            "value": null,
+            "pickList": [1,2]
+        }
+    ]
+}

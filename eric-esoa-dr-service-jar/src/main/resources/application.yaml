@@ -1,0 +1,236 @@
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+service:
+  feature-packs:
+    validation:
+      ignore-schema-errors: ${IGNORE_SCHEMA_ERRORS:false}
+  http-client:
+    retry:
+      max-attempts: 12
+      delay: 5
+  python-executor:
+    assets-dir: ${PYTHON_ASSETS_DIR:/var/dr/assets}
+  shell-executor:
+    process-path: ${SHELL_PROCESS_PATH:/usr/local/bin}
+  pagination:
+    default_limit: 100
+  substitution:
+    fail-on-unknown-tokens: ${FAIL_ON_UNKNOWN_TOKENS:true}
+  jobs:
+    cleanup-policy:
+      maxAgeDays: ${JOB_CLEANUP_MAX_AGE:7}
+      cron-interval: ${JOB_CLEANUP_SCHEDULE:0 0 0 * * *}
+    acquisition:
+      max-jobs: ${JOB_ACQUISITION_LIMIT:10}
+      scheduler-delay: ${JOB_ACQUISITION_SCHEDULER_DELAY:15000}
+    execution:
+      job-executor:
+        core-size: ${JOB_EXECUTOR_POOL_SIZE:10}
+        max-size: ${JOB_EXECUTOR_POOL_SIZE:10}
+        queue-size: ${JOB_EXECUTOR_QUEUE_SIZE:100}
+        await-termination: ${JOB_EXECUTOR_AWAIT_TERMINATION:false}
+        await-termination-seconds: ${JOB_EXECUTOR_AWAIT_TERMINATION_SECONDS:60}
+      task-executor:
+        core-size: ${TASK_EXECUTOR_POOL_SIZE:20}
+        max-size: ${TASK_EXECUTOR_POOL_SIZE:20}
+  rest-service:
+    baseUrl: ${REST_SERVICE_URL:http://eric-esoa-rest-service}
+    runUrlPath: /rest-service/v1/run
+  connected-system:
+    baseUrl: ${CONNECTED_SYSTEM_URL:http://localhost:8081}
+    subsystems-path: /subsystem-manager/v2/subsystems
+  message-subscriptions:
+    kafka:
+      list-topics-api-timeout: 15000
+      consumer:
+        reconnect-backoff: ${KAFKA_CONSUMER_RECONNECT_BACKOFF:10000}
+        reconnect-backoff-max: ${KAFKA_CONSUMER_RECONNECT_BACKOFF_MAX:300000}
+      backoff:
+        interval: 1000
+        max-failure: 5
+      tls:
+        jks-dir: ${KAFKA_JKS_DIR:/var/dr/msg-subscriptions/jks}
+        certificates:
+          secrets:
+            - type: truststore
+              dataFieldKey: ${TRUSTSTORE_SECRET_DATA_FIELD_KEY:server.p12}
+            - type: keystore
+              dataFieldKey: ${KEYSTORE_SECRET_DATA_FIELD_KEY:client.p12}
+        secret-watcher:
+          timer-delay: 60000
+    consistency-check:
+      interval: ${KAFKA_SCHEDULE_INTERVAL:60000}
+spring:
+  application:
+    name: eric-eosa-dr-service
+  lifecycle:
+    timeout-per-shutdown-phase: ${GRACEFUL_SHUTDOWN_TIMEOUT:60s}
+  profiles.active: prod
+  datasource:
+    url: jdbc:${DB_VENDOR:postgresql}:${JDBC_URL://${DB_HOST}:${DB_PORT:5432}/${DB_NAME:drdb}?currentSchema=${SCHEMA_NAME:dr_service}${SSL_PARAMETERS:}}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    max-lifetime: ${DB_CONNECTION_MAX_LIFETIME:840000}
+    hikari:
+      data-source-properties: stringtype=unspecified
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      max-lifetime: ${DB_CONNECTION_MAX_LIFETIME:840000}
+  flyway:
+    locations: ${MIGRATION_PATH:classpath:flyway/schemas}
+    baselineOnMigrate: true
+    url: jdbc:postgresql:${JDBC_URL://${DB_HOST}:${DB_PORT:5432}/${DB_NAME:drdb}?currentSchema=${SCHEMA_NAME:dr_service}${SSL_PARAMETERS:}}
+    user: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jackson:
+    default-property-inclusion: non_null
+  caches:
+    asset:
+      access-expiry: ${ASSET_CACHE_ACCESS_EXPIRY:3600}
+    groovy-asset:
+      access-expiry: ${GROOVY_ASSET_CACHE_ACCESS_EXPIRY:3600}
+    properties:
+      access-expiry: ${PROPERTIES_CACHE_ACCESS_EXPIRY:24}
+  codec:
+    # commented out until https://eteamproject.internal.ericsson.com/browse/ESOA-12901 is done
+    # max-in-memory-size: ${WEB_CLIENT_IN_MEMORY_SIZE:100MB}
+    max-in-memory-size-kb: ${WEB_CLIENT_IN_MEMORY_SIZE_KB:100000}
+  cloud:
+    kubernetes:
+      config:
+        enabled: ${SPRING_CLOUD_KUBERNETES_ENABLED:true}
+      reload:
+        enabled: true
+        strategy: refresh
+        monitoring-secrets: true
+        monitoring-config-maps: false
+logging:
+  config: ${LOGBACK_CONFIG_FILE:classpath:logback-json.xml}
+  endpoints:
+    exclude: /actuator/health, /ping, /metric
+  level:
+    root: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, loggers, metrics, prometheus
+      base-path: /actuator
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include:
+            - ping
+            - livenessState
+        readiness:
+          include:
+            - db
+            - readinessState
+      show-details: always
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    enable:
+      jvm: true
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      sla:
+        http:
+          server:
+            requests: 100ms,300ms,500ms
+  tracing:
+    enabled: true
+
+security:
+  tls:
+    enabled: ${SECURITY_TLS_ENABLED:false}
+  commonCa:
+    certDirectory: ${CA_CERT_BASE_DIRECTORY:/var/run/secrets/}eric-sec-sip-tls-trusted-root-cert/
+    certFile: ca.crt
+  keystore:
+    path: ${java.io.tmpdir}/keystore.jks
+    tlsCertDirectory: ${TLS_CERT_DIRECTORY:/var/run/secrets/eric-esoa-dr-service-server-cert/}
+    tlsCertFile: ${TLS_CERT_FILE:tls.crt}
+    tlsKeyFile: ${TLS_KEY_FILE:tls.key}
+  cryptoStoreParams:
+    storePass: "Y2hhbmdlaXQ="
+    keyPass: "Y2hhbmdlaXQ="
+    keyAlias: drService
+    keyStoreType: JKS
+  renewCertRetry:
+    delay: ${CERT_RENEW_RETRY_DELAY:10000}
+    times: ${CERT_RENEW_RETRY_COUNT:6}
+  systemMonitoring:
+    expiration: ${ALARM_EXPIRATION_PERIOD:600}
+    enabled: ${ALARMS_ENABLED:true}
+    faultManagement:
+        scheme: ${ALARM_API_SCHEME:https}
+        address: ${ALARM_API_ADDRESS:eric-fh-alarm-handler}
+        port: ${ALARM_API_PORT:6006}
+        apiPath: ${ALARM_API_PATH:alarm-handler/v1/fault-indications}
+        retry: ${ALARM_RETRY_COUNT:3}
+        delay: ${ALARM_DELAY:5000}
+        expiration: ${ALARM_EXPIRATION_PERIOD:600}
+    keystore:
+        tlsKeyFile: ${ALARM_TLS_KEY_FILE:tls.key}
+        tlsCertFile: ${ALARM_TLS_CERT_FILE:tls.crt}
+        tlsCertDirectory: ${ALARM_TLS_CERT_DIRECTORY:/var/run/secrets/eric-esoa-dr-service-alarm-handler-int-cert/}
+        storePass: "Y2hhbmdlaXQ="
+        keyAlias: eric-esoa-dr-service-adapter-alarm
+        path: ${java.io.tmpdir}/alarmkeystore.jks
+    kubernetesNamespace: ${KUBERNETES_NAMESPACE:default}
+    async-executor:
+      core-size: ${ALARM_ASYNC_EXECUTOR_CORE_SIZE:2}
+      max-size: ${ALARM_ASYNC_EXECUTOR_MAX_SIZE:10}
+      queue-size: ${ALARM_ASYNC_EXECUTOR_QUEUE_SIZE:50}
+
+server:
+  shutdown: graceful
+  port: ${SERVER_PORT:8080}
+  ssl:
+    port: ${SERVER_SSL_PORT:8443}
+  max-http-request-header-size: ${SERVER_MAX_HTTP_HEADER_SIZE:15KB}
+
+podName: ${HOSTNAME}
+
+netty:
+  http-client:
+    connection-pool:
+      maxConnections: ${NETTY_POOL_MAX_CONNECTIONS:50}
+      maxIdleTime: ${NETTY_POOL_MAX_IDLE_TIME:60s}
+      maxLifeTime: ${NETTY_POOL_MAX_LIFE_TME:300s}
+      evictInterval: ${NETTY_POOL_EVICT_INTERVAL:120s}
+      disposeInterval: ${NETTY_POOL_DISPOSE_INTERVAL:300s}
+      poolInactivityTime: ${NETTY_POOL_INACTIVITY_TIME:300s}

@@ -1,0 +1,12 @@
+name: listener_4
+description: "test listener using jinja function on inputs"
+triggers:
+  - condition: jinja({{request.eventType=='CREATE'}})
+    applicationName: application_5_2
+    jobName: job1
+    inputs:
+      reconcileUrl: jinja({{request.reconcileUrl}})
+      sourcesUrl: jinja({{request.sourcesUrl}})
+      targetsUrl: jinja({{request.targetsUrl}})
+      enrichUrl: jinja({{request.enrichUrl}})
+

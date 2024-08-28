@@ -1,0 +1,89 @@
+{
+  "items": [
+    {
+      "discrepancies": [
+        "Found in Target"
+      ],
+      "properties": {
+        "name": "object1",
+        "id": "1"
+      },
+      "filters": [
+        {
+          "name": "filter1",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-20/reconcile/1\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        }
+      ],
+      "status": "RECONCILED"
+    },
+    {
+      "discrepancies": [
+        "Mismatched in Target"
+      ],
+      "properties": {
+        "name": "object2",
+        "id": "2"
+      },
+      "filters": [
+        {
+          "name": "filter3",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-20/reconcile/2\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        }
+      ],
+      "status": "RECONCILED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Target"
+      ],
+      "properties": {
+        "name": "object3",
+        "id": "3"
+      },
+      "filters": [
+        {
+          "name": "filter2",
+          "reconcileAction": {
+            "name": "action1",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-20/reconcile/3\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        }
+      ],
+      "status": "RECONCILED"
+    },
+    {
+      "discrepancies": [
+        "Missing in Source"
+      ],
+      "properties": {
+        "name": "object100",
+        "id": "100"
+      },
+      "filters": [
+        {
+          "name": "filter4",
+          "reconcileAction": {
+            "name": "action2",
+            "status": "COMPLETED",
+            "command": "Method: POST\nURL: http://localhost:8081/fp-20/reconcile/100\nHeaders: [Content-Type:\"application/json\"]",
+            "commandOutput": "{\"result\":\"SUCCESS\"}"
+          }
+        }
+      ],
+      "status": "RECONCILED"
+    }
+  ],
+  "totalCount": 4
+}

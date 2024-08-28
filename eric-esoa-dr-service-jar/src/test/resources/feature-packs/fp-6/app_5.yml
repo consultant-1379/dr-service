@@ -1,0 +1,58 @@
+name: "application_5"
+description: |
+  Job that is triggered from listener which discovers source(s) and
+  then reconciles the sources using default match all filter.
+jobs:
+  - name: job1
+    description: "test job"
+    api:
+      properties:
+        - name: id
+        - name: name
+    discover:
+      inputs:
+        - name: sourcesUrl
+          mandatory: true
+      source:
+          fetchAction:
+            type: rest
+            preFunction: ~
+            command: ""
+            outputFormat: json
+            properties:
+              url: "{{inputs.sourcesUrl}}"
+              method: GET
+              headers:
+                Content-Type: [ "application/json" ]
+            postFunction: ~
+            mapping:
+              id: .id
+              name: .name
+          enrichAction: ~
+      target: ~
+      filters:
+        default:
+          filterMatchText: 'Missing in Target'
+          reconcileAction: default
+    reconcile:
+      inputs:
+        - name: reconcileUrl
+          mandatory: true
+      source:
+          enrichAction: ~
+      target:
+          enrichAction: ~
+          reconcileActions:
+            default:
+                type: rest
+                preFunction: ~
+                command: ""
+                outputFormat: json
+                properties:
+                  url: "{{inputs.reconcileUrl}}/{{source.id}}"
+                  method: POST
+                  headers:
+                    Content-Type: [ "application/json" ]
+                postFunction: ~
+                mapping:
+                  result: .result

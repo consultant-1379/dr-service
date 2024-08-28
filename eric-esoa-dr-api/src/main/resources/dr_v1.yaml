@@ -1,0 +1,2210 @@
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+openapi: 3.0.3
+info:
+  title: Discovery and Reconciliation API
+  description: |
+    Operations associated with onboarding and managing Feature Packs, and associated configurations. 
+    Executing discovery and reconciliation.
+  contact:
+    name: Ericsson
+  version: 1.0.0
+servers:
+  - url: '/'
+tags:
+  - name: Feature Packs
+  - name: Applications
+  - name: Jobs
+  - name: Job Schedules
+  - name: Input Configurations
+paths:
+  /discovery-and-reconciliation/v1/feature-packs:
+    get:
+      tags:
+        - Feature Packs
+      summary: Get Feature Packs
+      description: |
+        Returns a list of all the Feature Packs in the D&R framework.
+        
+        Sort is supported for properties (id, name, description, createdAt, modifiedAt).
+        Filter is supported for properties (id, name, description).
+      operationId: getFeaturePacks
+      parameters:
+        - $ref: "#/components/parameters/pagingOffset"
+        - $ref: "#/components/parameters/pagingLimit"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/filter"
+      responses:
+        200:
+          description: Feature Packs successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturePackListDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    post:
+      tags:
+        - Feature Packs
+      summary: Upload Feature Pack
+      description: |
+        Uploads a new Feature Pack into the D&R framework.
+      operationId: uploadFeaturePack
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Feature Pack name
+                description:
+                  type: string
+                  description: Feature Pack description
+                file:
+                  type: string
+                  format: binary
+                  description: Feature Pack zip file
+              required:
+                - name
+                - file
+        required: true
+      responses:
+        201:
+          description: Feature Pack successfully uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturePackDto'
+        400:
+          description: Feature Pack contains badly formatted configuration data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        409:
+          description: Feature Pack with given name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackId}:
+    get:
+      tags:
+        - Feature Packs
+      summary: Get Feature Pack
+      description: |
+        Returns information about a given Feature Pack.
+      operationId: getFeaturePack
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Feature Pack information successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturePackDto'
+        404:
+          description: Feature Pack with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    delete:
+      tags:
+        - Feature Packs
+      summary: Delete Feature Pack
+      description: |
+        Deletes a given Feature Pack from the D&R framework. 
+        
+        A Feature Pack can not be deleted if there are any associated Jobs in progress.
+        
+        Note: Any Job Schedules associated with the Feature Pack will also be deleted.
+      operationId: deleteFeaturePack
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Feature Pack deleted
+        404:
+          description: Feature Pack with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        409:
+          description: Feature Pack can not be deleted as there are associated operations ongoing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    put:
+      tags:
+        - Feature Packs
+      summary: Replace Feature Pack
+      description: |
+        Uploads an updated Feature Pack into the D&R framework, replacing the existing Feature Pack.
+
+        A Feature Pack can not be replaced if there are any associated Jobs in progress.
+
+        No further Discovery and Reconcile operations can be executed on Jobs associated with the original Feature Pack.
+        
+        Note: Any Job Schedules associated with the Feature Pack being replaced will also be deleted. Job Schedules will need to be re-created for the updated Feature Pack.
+        Note: Any message subscriptions associated with Listeners in the Feature Pack will be deleted.
+      operationId: updateFeaturePack
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: Feature Pack description
+                file:
+                  type: string
+                  format: binary
+                  description: Feature Pack zip file
+              required:
+                - file
+        required: true
+      responses:
+        201:
+          description: Feature Pack successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturePackDto'
+        400:
+          description: Feature Pack contains badly formatted configuration data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        404:
+          description: Feature Pack with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        409:
+          description: Feature Pack cannot be updated as there are associated operations ongoing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackId}/files:
+    get:
+      tags:
+        - Feature Packs
+      summary: Download Feature Pack
+      description: |
+        Downloads a Feature Pack zip file.
+      operationId: downloadFeaturePack
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Feature Pack successfully downloaded
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        404:
+          description: Feature Pack with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackId}/applications:
+    get:
+      tags:
+        - Applications
+      summary: Get Applications
+      description: |
+        Returns the list of Applications in a Feature Pack.
+      operationId: getApplications
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Applications successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationListDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackId}/applications/{applicationId}:
+    get:
+      tags:
+        - Applications
+      summary: Get Application
+      description: |
+        Returns an Application configuration.
+      operationId: getApplication
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Application configuration successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationConfigurationDto'
+              examples:
+                example_configuration:
+                  $ref: '#/components/examples/ApplicationConfigurationExample'
+        404:
+          description: Application with given id does not exist in feature pack
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackId}/input-configurations:
+    get:
+      tags:
+        - Input Configurations
+      summary: Get Input Configurations
+      description: |
+        Returns the list of Input configurations in a Feature Pack. An Input configuration provides predefined 
+        inputs for a discovery or reconcile.
+      operationId: getInputConfigurations
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Input Configurations successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationListDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    post:
+      tags:
+        - Input Configurations
+      summary: Create a new Input Configuration
+      description: |
+        Creates a new input configuration in a Feature Pack.
+        
+        An Input configuration provides predefined inputs for a discovery or reconcile and is used by the UI to populate input fields.
+      operationId: createInputConfiguration
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputConfigurationDto'
+            example:
+              name: 'my inputs'
+              decription: 'A description of my inputs'
+              inputs:
+                - name: input_1
+                  value: 1
+                - name: input_2
+                  pickList: [1,2,3]
+        required: true
+      responses:
+        201:
+          description: Input Configuration created
+        400:
+          description: Input Configuration contains badly formatted configuration data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        409:
+          description: Input Configuration with given name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackId}/input-configurations/{configurationId}:
+    get:
+      tags:
+        - Input Configurations
+      summary: Get Input Configuration
+      description: |
+        Returns an input configuration.
+        
+        By including the evaluateFunctions query parameter dynamic inputs will be evaluated and returned.
+      operationId: getInputConfiguration
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: configurationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: evaluateFunctions
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: Input Configuration successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InputConfigurationDto'
+              example:
+                id: 123
+                name: 'my inputs'
+                decription: 'A description of my inputs'
+                inputs:
+                  - name: input_1
+                    value: 1
+                  - name: input_2
+                    pickList: [1,2,3]
+        404:
+          description: Input Configuration with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    put:
+      tags:
+        - Input Configurations
+      summary: Update Input Configuration
+      description: |
+        Update an Input configuration in a Feature Pack.
+      operationId: updateInputConfiguration
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: configurationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputConfigurationDto'
+            example:
+              name: 'my inputs'
+              decription: 'A description of my inputs'
+              inputs:
+                - name: input_1
+                  value: 1
+                - name: input_2
+                  pickList: [1,2,3]
+        required: true
+      responses:
+        201:
+          description: Input configuration successfully updated
+        400:
+          description: Input configuration contains badly formatted data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        409:
+          description: Input configuration is read only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        404:
+          description: Input configuration with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    delete:
+      tags:
+        - Input Configurations
+      summary: Delete Input configuration
+      description: |
+        Deletes an Input configuration from a Feature Pack.
+      operationId: deleteInputConfiguration
+      parameters:
+        - name: featurePackId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: configurationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Input configuration deleted
+        409:
+          description: Input configuration is read only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        404:
+          description: Input configuration with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackName}/listener/{listenerName}/trigger:
+    post:
+      tags:
+        - Listeners
+      summary: Trigger a Listener
+      description: |
+        Trigger a Listener to perform a Discovery & Reconciliation job for a matching trigger condition.
+        
+        The Listener configuration defines one or more trigger conditions. The payload received in the trigger
+        request is applied to each of the trigger conditions to find a match. If a match is found then the discovery and 
+        reconciliation is performed for the job defined in the condition.
+        
+        The Job response will be returned when the Discovery and Reconciliation has completed, either successfully or 
+        with error. In case of successful execution, the outputs defined in the Listener Configuration will be
+        included in the Job response.
+      operationId: triggerListener
+      parameters:
+        - name: featurePackName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: listenerName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+            example:
+              input_1: value_1
+              input_2: value_2
+              eventType: CREATE
+      responses:
+        200:
+          description: Discovery and Reconciliation completed for the triggered listener.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListenerTriggerResponseDto'
+        404:
+          description: FeaturePack does not exist or Listener does not exist in the FeaturePack.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackName}/listener/{listenerName}/message-subscriptions:
+    post:
+      tags:
+        - Listeners
+      summary: Create message subscription
+      description: |
+        Create a message subscription towards an external message broker in order to automatically trigger the listener when a message is received on the configured topic(s).
+
+        The body of the request will contain the configuration required to subscribe to a message from a message broker of a given type.
+      operationId: createListenerMessageSubscription
+      parameters:
+        - name: featurePackName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: listenerName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/KafkaListenerMessageSubscriptionRequestDto'
+              discriminator:
+                propertyName: messageBrokerType
+                mapping:
+                  KAFKA: '#/components/schemas/KafkaListenerMessageSubscriptionRequestDto'
+            examples:
+              kafka_configuration_example:
+                value:
+                  name: "Msg_subscription_1"
+                  description: "Message subscription one"
+                  subsystemName: "subsystem_1"
+                  messageBrokerType: "KAFKA"
+                  messageConsumerConfiguration:
+                    groupId: "group_1"
+                    topicNames: ["topic_1", "topic_2"]
+      responses:
+        201:
+          description: Listener message subscription successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListenerMessageSubscriptionResponseDto'
+        400:
+          description: Contains badly formatted configuration data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        404:
+          description: FeaturePack does not exist, or Listener does not exist in the FeaturePack
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    get:
+      tags:
+        - Listeners
+      summary: Get message subscriptions
+      description: |
+        Returns the list of message subscriptions for a Listener.
+      operationId: getListenerMessageSubscriptions
+      parameters:
+        - name: featurePackName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: listenerName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Listener message subscriptions successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListenerMessageSubscriptionListDto'
+        404:
+          description: FeaturePack does not exist, or Listener does not exist in the FeaturePack
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/feature-packs/{featurePackName}/listener/{listenerName}/message-subscriptions/{messageSubscriptionId}:
+    delete:
+      tags:
+        - Listeners
+      summary: Delete message subscription
+      description: |
+        Deletes a Listener message subscription.
+      operationId: deleteListenerMessageSubscription
+      parameters:
+        - name: featurePackName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: listenerName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageSubscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Listener message subscription deleted
+        404:
+          description: Message subscription, FeaturePack or Listener does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/jobs:
+    get:
+      tags:
+        - Jobs
+      summary: Get Discovery Jobs
+      description: |
+        Returns a list of all discovery Jobs.
+        
+        Sort is supported for properties (id, name, description, status, startDate, featurePackId, featurePackName, applicationId, applicationName,
+        applicationJobName, jobScheduleId).
+        Filter is supported for properties (id, name, description, status, featurePackId, featurePackName, applicationId, applicationName, 
+        applicationJobName, jobScheduleId).
+      operationId: getDiscoveryJobs
+      parameters:
+        - $ref: "#/components/parameters/pagingOffset"
+        - $ref: "#/components/parameters/pagingLimit"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/filter"
+      responses:
+        200:
+          description: Discovery Jobs successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    post:
+      tags:
+        - Jobs
+      summary: Create Discovery Job
+      description: |
+        Starts a new discovery. The output from the discovery will be a set of source and target objects, know as discovered objects, which will be utilized to resolve the discrepancies between the source and target systems in the subsequent reconcile request(s).
+
+        In the request the feature pack and application containing the job are identified by either their ids or names. The job to be executed is identified by the 'applicationJobName; corresponding to the job name in the Application Configuration file.
+
+        The job transitions to a DISCOVERED state after successful discovery. Reconciles can then be performed on the job.
+        If there are any errors during the discovery, then the job finishes in a DISCOVERY_FAILED state. It is not possible to perform any further actions on the job.
+        
+        It is possible to initiate an auto-reconcile. This will automatically execute a reconcile of all discovered objects after the discovery has successfully completed.
+      operationId: executeDiscoveryJob
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteJobDto'
+            examples:
+              example_body_with_IDs:
+                $ref: '#/components/examples/ExecuteJobDtoWithIds'
+              example_body_with_Names:
+                $ref: '#/components/examples/ExecuteJobDtoWithNames'
+              example_body_with_execution_options:
+                $ref: '#/components/examples/ExecuteJobDtoWithExecutionOptions'
+        required: true
+      responses:
+        202:
+          description: Job execution accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteJobResponseDto'
+        400:
+          description: Request contains badly formatted data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        404:
+          description: Cannot find resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    delete:
+      tags:
+        - Jobs
+      summary: Delete Jobs
+      description: |
+        Delete jobs using a filter. 
+        
+        Filter is supported for properties (id, name, description, status, featurePackId, featurePackName, jobScheduleId).
+        
+        By default, jobs which are InProgress (DISCOVERY_INPROGRESS, RECONCILE_INPROGRESS) will not be deleted even if matched by the filter. The
+        delete request will succeed, deleting all jobs matched by the filter excluding the InProgress jobs.
+        
+        If required the InProgress jobs can also be deleted by including the force header option, with the exception of InProgress
+        scheduled jobs which must be deleted individually. If force flag is set to true and the filter matches one or more InProgress scheduled
+        jobs then the delete request will fail.
+      operationId: deleteJobs
+      parameters:
+        - $ref: "#/components/parameters/filter"
+        - name: force
+          description: flag when if set to true allows to delete a job in any state.
+          in: header
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        200:
+          description: Discovery Jobs successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteJobsResponseDto'
+        400:
+          description: No filter or invalid filter supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/jobs/{jobId}/duplicate:
+    post:
+      tags:
+        - Jobs
+      summary: Create Discovery Job using the properties from an existing Job
+      description: |
+        Starts a new discovery using properties duplicated from an existing Job.
+
+        All properties from the original Job are duplicated, including the execution options.
+
+        There is no restriction on the current state of the original Job for the duplicated Job to proceed.
+      operationId: duplicateDiscoveryJob
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        202:
+          description: Job execution accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteJobResponseDto'
+        404:
+          description: Job with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/jobs/{jobId}:
+    get:
+      tags:
+        - Jobs
+      summary: Get Discovery Job
+      description: |
+        Returns information about a given discovery Job.
+      operationId: getDiscoveryJob
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Job information successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDto'
+        404:
+          description: Job with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    delete:
+      tags:
+        - Jobs
+      summary: Delete Job
+      description: |
+        Deletes a given discovery Job.
+        
+        A Job can not be deleted if there are any associated discovery or reconciles in progress. This restriction can be overridden with the force flag.
+      operationId: deleteJob
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: force
+          description: flag when if set to true allows to delete a job in any state
+          in: header
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        204:
+          description: Job deleted
+        404:
+          description: Job with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        409:
+          description: Job can not be deleted as there are associated operations ongoing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/jobs/{jobId}/discovered-objects:
+    get:
+      tags:
+        - Jobs
+      summary: Get Discovered Objects
+      description: |
+        Returns the list of discovered objects associated with a Job. 
+        
+        A discovered object represents an object from the source or target system that has matched a filter identifying a particular discrepancy between the source and target systems. A filter for example could be identifying source objects that do not exists in the target system.
+        
+        Each filter is associated with a reconcile action designed to align the source and target system for the discrepancy. The reconcile action will be executed during the reconcile phase.
+        
+        Sort is supported for properties (objectId, status). Filter is supported for properties (objectId, status and for properties contained in the properties map).
+      operationId: getDiscoveredObjects
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/pagingOffset"
+        - $ref: "#/components/parameters/pagingLimit"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/filter"
+      responses:
+        200:
+          description: Discovered objects successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveredObjectListDto'
+        400:
+          description: Request contains badly formatted data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        404:
+          description: Job with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/jobs/{jobId}/reconciliations:
+    post:
+      tags:
+        - Jobs
+      summary: Execute a Reconcile
+      description: |
+        Executes a Reconcile on the discovered objects found during discovery. 
+
+        The discrepancies between the source and target systems have been identified by the discovery and now the user can start the process of reconciling the source and target systems to bring them into alignment.
+        
+        A number of different strategies can be used to proceed with the reconcile:
+        - In one execution: If no objects or filters are supplied in the request the reconcile will execute on all discovered objects and all matching filters.
+        - In increments: Multiple reconciles can be performed by supplying combinations of a subset of the discovered objects and a subset of filters. It should be noted that if a discovered object is successfully reconciled with a subset of filters then the remaining filters for that discovered object cannot be executed in another reconcile.
+      operationId: executeReconcile
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteReconcileDto'
+            examples:
+              Perform_reconciliation_on_all_discovered_objects:
+                value:
+                  inputs:
+                    input_1: value_1
+              Perform_reconciliation_on_all_discovered_objects_using_filter_set:
+                value:
+                  inputs:
+                    input_1: value_1
+                  filters:
+                    - filter_1
+                    - filter_2
+              Perform_reconciliation_using_limited_discovered_object_set:
+                value:
+                  inputs:
+                    input_1: value_1
+                  filters:
+                    - filter_1
+                    - filter_2
+                  objects:
+                    - objectId: 123
+                      inputs:
+                        input_2: value_2
+                      filters:
+                        - filter_1
+                        - filter_2
+        required: true
+      responses:
+        202:
+          description: Reconcile execution accepted
+        400:
+          description: Request contains badly formatted data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        404:
+          description: Can't find resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/job-schedules:
+    post:
+      tags:
+        - Job Schedules
+      summary: Create Job Schedule
+      description: |
+        Create a job schedule with schedule defined using cron expression. 
+        
+        The job schedule is enabled by default after creation.
+        
+        The job will be scheduled according to the timezone configured on the server. So for example, if the server is configured for UTC timezone, then the cron expression should be created according to UTC time.
+        
+        The jobs executed by the schedule can be fetched using 'jobScheduledId' filter on the Jobs API.
+      operationId: createJobSchedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobScheduleDto'
+        required: true
+      responses:
+        201:
+          description: Job schedule successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobScheduleDto'
+        400:
+          description: |
+            Missing mandatory or invalid parameters in request.
+            
+            Invalid cron expression in request. 
+            
+            Feature Pack, Application or AplicationJobName does not exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        409:
+          description: Job schedule with same name already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    get:
+      tags:
+        - Job Schedules
+      summary: Get Job Schedules
+      description: |
+        Get all job schedules.
+        Sort is supported for properties (id, name, description, createdAt).
+        Filter is supported for properties (id, name, description, featurePackName, featurePackId).
+      operationId: getJobSchedules
+      parameters:
+        - $ref: "#/components/parameters/pagingOffset"
+        - $ref: "#/components/parameters/pagingLimit"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/filter"
+      responses:
+        200:
+          description: Job schedules successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobScheduleListDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /discovery-and-reconciliation/v1/job-schedules/{jobScheduleId}:
+    get:
+      tags:
+        - Job Schedules
+      summary: Get Job Schedule
+      description: |
+        Get Job schedule details.
+      operationId: getJobSchedule
+      parameters:
+        - name: jobScheduleId
+          description: the id of the job schedule
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Job schedule information successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobScheduleDto'
+        404:
+          description: Job Schedule with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    delete:
+      tags:
+        - Job Schedules
+      summary: Delete Job schedule
+      description: |
+        Deletes a job schedule.
+        
+        No further jobs will be executed for the schedule. If a job is currently running, the job schedule will still be deleted but the running job will not be affected.
+      operationId: deleteJobSchedule
+      parameters:
+        - name: jobScheduleId
+          description: the job schedule id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Job schedule deleted
+        404:
+          description: Job schedule with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    patch:
+      tags:
+        - Job Schedules
+      summary: Enable/Disable a Job schedule.
+      description: |
+        Enable or disable a job schedule.
+        When disabled, there will be no futher jobs executed for the schedule. 
+        If a scheduled job is running when disabling, the job will not be affected and will continue to run until completion. No subsequent jobs 
+        will be executed until the schedule is enabled.
+      operationId: enableDisableJobSchedule
+      parameters:
+        - name: jobScheduleId
+          description: the job schedule id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - enabled
+              properties:
+                enabled:
+                  description: flag to enable or disable the job schedule
+                  type: boolean
+            example:
+              enabled: true
+        required: true
+      responses:
+        204:
+          description: Job schedule successfully enabled/disabled
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        404:
+          description: Job schedule with given id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+components:
+  schemas:
+    #################################################################################
+    #                              Error response Schema                            #
+    #################################################################################
+    ErrorResponseDto:
+      type: object
+      required:
+        - errorMessage
+        - errorCode
+      properties:
+        errorMessage:
+          type: string
+          description: User Message
+          readOnly: true
+        errorCode:
+          type: string
+          description: Error Code.
+          readOnly: true
+    #################################################################################
+    #                              Feature Pack Schema                              #
+    #################################################################################
+    FeaturePackListDto:
+      type: object
+      required:
+        - items
+        - totalCount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeaturePackSummaryDto'
+        totalCount:
+          type: integer
+    FeaturePackSummaryDto:
+      type: object
+      required:
+        - id
+        - name
+        - createdAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          description: Feature Pack name
+        description:
+          type: string
+          description: Feature Pack description
+        createdAt:
+          type: string
+          description: Feature Pack creation date
+          readOnly: true
+        modifiedAt:
+          type: string
+          description: Feature Pack last modification date
+          readOnly: true
+    FeaturePackDto:
+      allOf:
+        - $ref: '#/components/schemas/FeaturePackSummaryDto'
+        - type: object
+          properties:
+            applications:
+              type: array
+              description: List of Application configurations
+              items:
+                $ref: '#/components/schemas/ConfigurationSummaryDto'
+            listeners:
+              type: array
+              description: List of Listener configurations
+              items:
+                $ref: '#/components/schemas/ConfigurationSummaryDto'
+            assets:
+              type: array
+              description: List of Assets
+              items:
+                $ref: '#/components/schemas/ConfigurationSummaryDto'
+            properties:
+              type: array
+              description: List of properties
+              items:
+                $ref: '#/components/schemas/PropertyDto'
+            inputs:
+              type: array
+              description: List of Input configurations
+              items:
+                $ref: '#/components/schemas/ConfigurationSummaryDto'
+    #################################################################################
+    #                         Base Schema for Configurations                        #
+    #################################################################################
+    ConfigurationListDto:
+      type: object
+      required:
+        - items
+        - totalCount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfigurationSummaryDto'
+        totalCount:
+          type: integer
+    ConfigurationSummaryDto:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          description: Configuration name
+        description:
+          type: string
+          description: Configuration description
+    #################################################################################
+    #                       Application Configuration Schema                        #
+    #################################################################################
+    ApplicationConfigurationDto:
+      allOf:
+        - $ref: '#/components/schemas/ConfigurationSummaryDto'
+        - type: object
+          required:
+            - jobs
+          properties:
+            jobs:
+              type: array
+              items:
+                $ref: '#/components/schemas/ApplicationConfigurationJobDto'
+    ApplicationConfigurationJobDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        discover:
+          $ref: '#/components/schemas/ApplicationConfigurationDiscoverDto'
+        reconcile:
+          $ref: '#/components/schemas/ApplicationConfigurationReconcileDto'
+        api:
+          type: object
+          properties:
+            properties:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+    ApplicationConfigurationDiscoverDto:
+      type: object
+      properties:
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationConfigurationInputsDto'
+        source:
+          type: object
+          properties:
+            fetchAction:
+              $ref: '#/components/schemas/ApplicationConfigurationActionDto'
+            enrichAction:
+              $ref: '#/components/schemas/ApplicationConfigurationActionDto'
+        target:
+          type: object
+          properties:
+            fetchAction:
+              $ref: '#/components/schemas/ApplicationConfigurationActionDto'
+            enrichAction:
+              $ref: '#/components/schemas/ApplicationConfigurationActionDto'
+        linkSourceAndTarget:
+          type: string
+        filters:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ApplicationConfigurationFilterDto'
+    ApplicationConfigurationFilterDto:
+      type: object
+      required:
+        - reconcileAction
+        - filterMatchText
+      properties:
+        condition:
+          $ref: '#/components/schemas/FilterConditionDto'
+        reconcileAction:
+          type: string
+        filterMatchText:
+          type: string
+    FilterConditionDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          enum:
+            - sourceInTarget
+            - sourceNotInTarget
+            - sourceMismatchedInTarget
+            - targetNotInSource
+            - sourceScript
+            - targetScript
+        arg:
+          type: string
+    ApplicationConfigurationReconcileDto:
+      type: object
+      required:
+        - target
+      properties:
+        inputs:
+          items:
+            $ref: '#/components/schemas/ApplicationConfigurationInputsDto'
+        source:
+          type: object
+          properties:
+            enrichAction:
+              $ref: '#/components/schemas/ApplicationConfigurationActionDto'
+        target:
+          type: object
+          required:
+            - actions
+          properties:
+            enrichAction:
+              $ref: '#/components/schemas/ApplicationConfigurationActionDto'
+            reconcileActions:
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/ApplicationConfigurationActionDto'
+    ApplicationConfigurationInputsDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        mandatory:
+          type: boolean
+        description:
+          type: string
+    ApplicationConfigurationActionDto:
+      type: object
+      required:
+        - type
+        - mapping
+      properties:
+        type:
+          type: string
+          enum:
+            - shell
+            - rest
+            - python
+        preFunction:
+          type: string
+        outputFormat:
+          type: string
+          enum:
+            - json
+        postFunction:
+          type: string
+        mapping:
+          type: object
+          additionalProperties: {}
+        command:
+          type: string
+        properties:
+          type: object
+          additionalProperties: {}
+    #################################################################################
+    #                      Properties Configuration Schema                          #
+    #################################################################################
+    PropertiesConfigurationDto:
+      properties:
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyDto'
+    PropertyDto:
+      properties:
+        name:
+          type: string
+        value:
+          type: object
+    #################################################################################
+    #                          Input Configuration Schema                          #
+    #################################################################################
+    InputConfigurationDto:
+      allOf:
+        - $ref: '#/components/schemas/ConfigurationSummaryDto'
+        - type: object
+          properties:
+            inputs:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  value:
+                    type: object
+                  pickList:
+                    type: object
+    #################################################################################
+    #                                   Asset Schema                                #
+    #################################################################################
+    AssetDto:
+      allOf:
+        - $ref: '#/components/schemas/ConfigurationSummaryDto'
+        - type: object
+          properties:
+            properties:
+              type: object
+              additionalProperties: {}
+    #################################################################################
+    #                                Listener Schema                                #
+    #################################################################################
+    ListenerConfigurationDto:
+      allOf:
+        - $ref: '#/components/schemas/ConfigurationSummaryDto'
+        - type: object
+          properties:
+            outputs:
+              type: object
+              additionalProperties: {}
+            triggers:
+              type: array
+              items:
+                type: object
+                properties:
+                  condition:
+                    type: string
+                  applicationName:
+                    type: string
+                  jobName:
+                    type: string
+                  inputs:
+                    type: object
+                    additionalProperties: {}
+    #################################################################################
+    #                   Listener Message Subscription Schema                        #
+    #################################################################################
+    ListenerMessageSubscriptionBaseDto:
+      type: object
+      required:
+        - name
+        - messageBrokerType
+        - subsystemName
+      properties:
+        name:
+          type: string
+          x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank"
+          description: |
+            Name for the message subscription
+        description:
+          type: string
+          description: |
+            Optional description for the message subscription
+        subsystemName:
+          type: string
+          x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank"
+          description: |
+            Subsystem containing message broker connection details
+        messageBrokerType:
+          type: string
+          x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank"
+          description: |
+            Message broker used i.e. KAFKA
+    KafkaListenerMessageSubscriptionRequestDto:
+      allOf:
+        - $ref: '#/components/schemas/ListenerMessageSubscriptionBaseDto'
+      required:
+        - messageConsumerConfiguration
+      properties:
+        messageConsumerConfiguration:
+          type: object
+          required:
+            - topicNames
+          properties:
+            groupId:
+              type: string
+              description: |
+                Consumer group id. If not provided a default value will be set.
+            topicNames:
+              type: array
+              x-field-extra-annotation: "@jakarta.validation.constraints.NotEmpty"
+              description: |
+                List of one or more topics to listen on
+              items:
+                type: string
+    ListenerMessageSubscriptionResponseDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: |
+            The id of the message subscription
+    ListenerMessageSubscriptionListDto:
+      type: object
+      required:
+        - items
+        - totalCount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListenerMessageSubscriptionDto'
+        totalCount:
+          type: integer
+    ListenerMessageSubscriptionDto:
+      allOf:
+        - $ref: '#/components/schemas/ListenerMessageSubscriptionBaseDto'
+      type: object
+      properties:
+        id:
+          type: string
+        messageConsumerConfiguration:
+          type: object
+          additionalProperties: {}
+    #################################################################################
+    #                                   Job Schema                                  #
+    #################################################################################
+    ExecuteJobDto:
+      type: object
+      required:
+        - applicationJobName
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        featurePackId:
+          type: string
+        featurePackName:
+          type: string
+        applicationId:
+          type: string
+        applicationName:
+          type: string
+        applicationJobName:
+          type: string
+        inputs:
+          type: object
+          additionalProperties: {}
+        executionOptions:
+          type: object
+          additionalProperties: false
+          properties:
+            autoReconcile:
+              type: boolean
+    ExecuteJobResponseDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    JobSummaryDto:
+      type: object
+      required:
+        - id
+        - featurePackId
+        - applicationId
+        - applicationJobName
+        - createdAt
+        - state
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        featurePackId:
+          type: string
+        featurePackName:
+          type: string
+        applicationId:
+          type: string
+        applicationName:
+          type: string
+        applicationJobName:
+          type: string
+        startDate:
+          type: string
+        completedDate:
+          type: string
+        status:
+          type: string
+          enum:
+            - NEW
+            - DISCOVERY_INPROGRESS
+            - DISCOVERY_FAILED
+            - DISCOVERED
+            - RECONCILE_REQUESTED
+            - RECONCILE_INPROGRESS
+            - PARTIALLY_RECONCILED
+            - RECONCILE_FAILED
+            - COMPLETED
+        jobScheduleId:
+          type: string
+          description: The id of the Job Schedule if its a scheduled job execution.
+    JobDto:
+      allOf:
+        - $ref: '#/components/schemas/JobSummaryDto'
+      type: object
+      required:
+        - discoveredObjectsCount
+        - reconciledObjectsCount
+        - reconciledObjectsErrorCount
+      properties:
+        inputs:
+          type: object
+          additionalProperties: {}
+        discoveredObjectsCount:
+          type: integer
+        reconciledObjectsCount:
+          type: integer
+        reconciledObjectsErrorCount:
+          type: integer
+        errorMessage:
+          type: string
+    JobListDto:
+      type: object
+      required:
+        - items
+        - totalCount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobSummaryDto'
+        totalCount:
+          type: integer
+    DiscoveredObjectDto:
+      type: object
+      required:
+        - objectId
+        - discrepancies
+        - properties
+        - filters
+        - isReconciled
+        - reconcileInProgress
+      properties:
+        objectId:
+          type: string
+        discrepancies:
+          type: array
+          items:
+            type: string
+        properties:
+          type: object
+          additionalProperties: {}
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterDto'
+        errorMessage:
+          type: string
+        status:
+          type: string
+          enum:
+            - NEW
+            - DISCOVERED
+            - RECONCILING
+            - RECONCILE_FAILED
+            - PARTIALLY_RECONCILED
+            - RECONCILED
+    DiscoveredObjectListDto:
+      type: object
+      required:
+        - items
+        - totalCount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoveredObjectDto'
+        totalCount:
+          type: integer
+    ExecuteReconcileDto:
+      type: object
+      properties:
+        inputs:
+          type: object
+          additionalProperties: {}
+        filters:
+          type: array
+          items:
+            type: string
+        objects:
+          type: array
+          items:
+            type: object
+            properties:
+              objectId:
+                type: string
+              inputs:
+                type: object
+                additionalProperties: {}
+              filters:
+                type: array
+                items:
+                  type: string
+    FilterDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        reconcileAction:
+          type: object
+          properties:
+            name:
+              type: string
+            status:
+              type: string
+              enum:
+                - NOT_STARTED
+                - INPROGRESS
+                - COMPLETED
+                - FAILED
+            command:
+              type: string
+            commandOutput:
+              type: string
+            errorMessage:
+              type: string
+    ListenerTriggerResponseDto:
+      type: object
+      properties:
+        job:
+          $ref: '#/components/schemas/JobDto'
+        outputs:
+          type: object
+          additionalProperties: {}
+    #################################################################################
+    #                               Job Schedules Schema                            #
+    #################################################################################
+    JobScheduleListDto:
+      type: object
+      required:
+        - items
+        - totalCount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobScheduleSummaryDto'
+        totalCount:
+          type: integer
+    JobScheduleSummaryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the job schedule.
+        name:
+          type: string
+          description: The name of the job schedule.
+        description:
+          type: string
+          description: The description of the job schedule.
+        createdAt:
+          type: string
+          description: The date the job schedule was created, in ISO-8601 format with UTC offset. e.g 2024-01-01T12:00:00.000Z.
+          readOnly: true
+        expression:
+          type: string
+          description: The job schedule expression where the supported format is cron only.
+        enabled:
+          type: boolean
+          description: Enable/Disable execution of the scheduled job.
+        jobSpecification:
+          $ref: '#/components/schemas/ExecuteJobDto'
+    JobScheduleDto:
+      allOf:
+        - $ref: '#/components/schemas/JobScheduleSummaryDto'
+    CreateJobScheduleDto:
+      type: object
+      required:
+        - name
+        - expression
+        - jobSpecification
+      properties:
+        name:
+          type: string
+          description: The name of the Job Schedule.
+          x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank"
+        description:
+          type: string
+          description: A description of the Job Schedule.
+        expression:
+          type: string
+          x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank"
+          description: |
+            The expression defining the schedule for the job, where the supported expression format is Spring Cron.
+            
+            Spring cron format is comparable to Unix cron expression with the additional capability to specify seconds. As such the cron expression takes 6 fields (second, minute, hour, day, month, and weekday). 
+            
+            For example, the expression '*/30 * * * * *' will run every 30 seconds.
+        jobSpecification:
+          $ref: '#/components/schemas/ExecuteJobDto'
+    DeleteJobsResponseDto:
+      type: object
+      properties:
+        deleted:
+          type: long
+          description: the number of deleted jobs
+  parameters:
+    pagingOffset:
+      name: offset
+      description: |
+        Used for paging. The (zero-based) offset of the first item returned in the list.
+      in: query
+      schema:
+        type: string
+    pagingLimit:
+      name: limit
+      description: |
+        Used for paging. The maximum number of entries to return.
+
+        Defaults to 100 if no value supplied.
+      in: query
+      schema:
+        type: string
+    sort:
+      name: sort
+      description: |
+        Field to define the sort order.
+
+        To indicate sorting direction, field may be prefixed with + (ascending) or - (descending), e.g. /feature-packs?sort=+name.
+      in: query
+      schema:
+        type: string
+    filter:
+      name: filters
+      description: |
+        Filter results using FIQL
+
+        ### FIQL Suppported
+
+        ### Operators
+
+        | Operator | Description   | Example                                                            |
+        |----------|---------------|--------------------------------------------------------------------|
+        |    ==    |   equal to    | "name==some_name" find all items whose name is equal to some_name  |
+
+
+        ### Wildcards
+
+        Use * for wild cards.
+        #### Examples
+
+        "name==some_name*"  Returns all items whose name starts with some_name
+
+        "name=*some_name"  Returns all items whose name ends with some_name
+
+        "name=*some_name*" Returns all items whose name contains some_name
+        ### Composition
+
+        | Operator  |  Description     | Example                                                                                                   |
+        |-----------|------------------|-----------------------------------------------------------------------------------------------------------|
+        |     ;     | and              |  "name==some_name;description==feature" find all items whose name is some_name AND description is feature |
+        |     ,     | or               |  "name==some_name,name==some_other_name" find all items whose name is some_name OR some_other_name        |
+      in: query
+      schema:
+        type: string
+  examples:
+    ApplicationConfigurationExample:
+      value:
+        id: '123'
+        name: "myappconfig"
+        description: "Example Application Configuration"
+        jobs:
+          - name: job1
+            description: "job description"
+            api:
+              properties:
+                - name: id
+                - name: name
+            discover:
+              inputs:
+                - name: input1
+                  mandatory: true
+                  description: Help message for input1
+              source:
+                fetchAction:
+                  type: shell
+                  command: cat sources.json
+                  outputFormat: json
+                  mapping:
+                    id: .id
+                    name: .name
+              target:
+                fetchAction:
+                  type: rest
+                  outputFormat: json
+                  properties:
+                    url: "http://external-system/targets"
+                    method: GET
+                    headers:
+                      Content-Type: [ "application/json" ]
+                  mapping:
+                    id: .id
+                    name: .name
+              linkSourceAndTarget: 'id:id'
+              filters:
+                filter1:
+                  condition:
+                    name: sourceNotInTarget
+                  filterMatchText: 'Missing in Target'
+                  reconcileAction: action1
+                filter2:
+                  condition: sourceMismatchedInTarget
+                  arg: 'prop1:prop1'
+                  filterMatchText: 'Mismatched in Target'
+                  reconcile: action2
+            reconcile:
+              inputs:
+                - name: reconcileInput1
+                  mandatory: false
+                  description: Help message for input1
+              target:
+                reconcileActions:
+                  action1:
+                    type: shell
+                    command: reconcile.sh {payload}
+                    outputFormat: json
+                    mapping:
+                      result: .result
+                  action2:
+                    type: shell
+                    command: reconcile2.sh {payload}
+                    outputFormat: json
+                    mapping:
+                      result: .result
+    ExecuteJobDtoWithIds:
+      value:
+        name: 'job1'
+        description: 'Example executionDto'
+        featurePackId: '1'
+        applicationId: '1'
+        applicationJobName: 'enm_cts'
+        inputs:
+          input_1: value1
+          input_2: value2
+    ExecuteJobDtoWithNames:
+      value:
+        name: 'job1'
+        description: 'Example executionDto'
+        featurePackName: 'fp_1'
+        applicationName: 'app_1'
+        applicationJobName: 'enm_cts'
+        inputs:
+          input_1: value1
+          input_2: value2
+    ExecuteJobDtoWithExecutionOptions:
+      value:
+        name: 'job1'
+        description: 'Example executionDto'
+        featurePackId: '1'
+        applicationId: '1'
+        applicationJobName: 'enm_cts'
+        executionOptions: {"autoReconcile": true}
+        inputs:
+          input_1: value1
+          input_2: value2
